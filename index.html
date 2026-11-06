@@ -16,11 +16,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
-/* Layout concept: a steel plate coated in layout fluid opens the page with one scribed part;
+/* Layout concept: a white sheet opens the page with one drawn part;
    below it, the site reads as an engineering data sheet that ends in a drawing title block. */
 :root {
-  --bg: #EDEFF2;
-  --surface: #F8F9FB;
+  color-scheme: light;
+  --bg: #FFFFFF;
+  --surface: #FFFFFF;
   --ink: #12161F;
   --muted: #535D70;
   --rule: #C6CCD6;
@@ -31,28 +32,16 @@
   --off: #697386;
   --bar: #2A3CB8;
 
-  /* The layout-fluid band keeps one look in both themes. */
-  --dykem: #18246E;
-  --dykem-deep: #111A55;
-  --scribe: #E4EAFF;
-  --scribe-dim: #A6B3EC;
-  --flag: #FFA366;
+  /* Top section and drawing colours, on white. */
+  --dykem: #FFFFFF;
+  --dykem-deep: #FFFFFF;
+  --scribe: #2A3040;
+  --scribe-dim: #535D70;
+  --flag: #B5420A;
 
   --display: "Archivo", "Arial Narrow", Arial, sans-serif;
   --body: "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
   --mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #0F1320; --surface: #171C2C; --ink: #E8ECF4; --muted: #A1ABBF; --rule: #2F374C;
-    --accent: #A3AFFF; --callout: #FFA366; --ok: #6FD6A0; --warn: #E9BE63; --off: #8791A6; --bar: #7F8FFF;
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #0F1320; --surface: #171C2C; --ink: #E8ECF4; --muted: #A1ABBF; --rule: #2F374C;
-  --accent: #A3AFFF; --callout: #FFA366; --ok: #6FD6A0; --warn: #E9BE63; --off: #8791A6; --bar: #7F8FFF;
-  color-scheme: dark;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -78,14 +67,14 @@ a { color: var(--accent); }
 .skip:focus { left: 16px; }
 
 /* Plate: header and hero */
-.plate { background: var(--dykem); color: #fff; }
+.plate { background: var(--dykem); color: var(--ink); border-bottom: 1px solid var(--rule); }
 .topbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem 2rem; padding-block: 1.1rem; }
-.brand { display: flex; align-items: center; gap: .7rem; color: #fff; text-decoration: none; }
+.brand { display: flex; align-items: center; gap: .7rem; color: var(--ink); text-decoration: none; }
 .brand b { font: 800 1.5rem/1 var(--display); font-stretch: 125%; letter-spacing: .03em; }
 .brand span { font: 400 .75rem/1.25 var(--mono); color: var(--scribe-dim); }
 .topnav { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem 1.5rem; }
 .topnav a { color: var(--scribe); font-size: .9375rem; text-decoration: none; padding-block: .35rem; }
-.topnav a:hover { color: #fff; text-decoration: underline; text-underline-offset: 4px; }
+.topnav a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
 :where(.plate) :focus-visible { outline-color: var(--flag); }
 
 .hero { display: grid; gap: 2rem; padding-block: 2rem 3rem; align-items: center; }
@@ -103,43 +92,43 @@ a { color: var(--accent); }
   display: inline-block; padding: .8rem 1.3rem; border: 1px solid transparent; border-radius: 2px;
   font: 600 1rem/1.2 var(--body); text-decoration: none; cursor: pointer;
 }
-.btn-flag { background: var(--flag); color: #1B1005; }
-.btn-flag:hover { background: #FFB887; }
-.btn-line { border-color: var(--scribe-dim); color: #fff; background: transparent; }
-.btn-line:hover { background: var(--dykem-deep); }
+.btn-flag { background: var(--flag); color: #FFFFFF; }
+.btn-flag:hover { background: #96360A; }
+.btn-line { border-color: var(--scribe-dim); color: var(--ink); background: transparent; }
+.btn-line:hover { background: var(--rule); }
 
 /* Drawing */
-.sheet { background: var(--dykem-deep); border: 1px solid #39479B; }
-.stages { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid #39479B; }
+.sheet { background: var(--dykem-deep); border: 1px solid #C6CCD6; }
+.stages { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid #C6CCD6; }
 .stages button {
-  appearance: none; background: transparent; border: 0; border-right: 1px solid #39479B; color: var(--scribe-dim);
+  appearance: none; background: transparent; border: 0; border-right: 1px solid #C6CCD6; color: var(--scribe-dim);
   padding: .7rem .25rem; font: 500 .8125rem/1.2 var(--mono); cursor: pointer;
 }
 .stages button:last-child { border-right: 0; }
-.stages button:hover { color: #fff; }
-.stages button[aria-selected="true"] { background: var(--dykem); color: #fff; box-shadow: inset 0 -3px 0 var(--flag); }
+.stages button:hover { color: var(--ink); }
+.stages button[aria-selected="true"] { background: var(--dykem); color: var(--ink); box-shadow: inset 0 -3px 0 var(--flag); }
 .stages button:focus-visible { outline-offset: -3px; }
 .drawing { display: block; width: 100%; height: auto; }
 .drawing text { font-family: var(--mono); font-size: 11px; fill: var(--scribe); }
 .drawing text.hot { fill: var(--flag); }
 .drawing text.small { font-size: 9.5px; fill: var(--scribe-dim); }
-.geo { fill: none; stroke: #fff; stroke-width: 1.5; }
+.geo { fill: none; stroke: #12161F; stroke-width: 1.5; }
 .thin { fill: none; stroke: var(--scribe-dim); stroke-width: .75; }
 .center { fill: none; stroke: var(--scribe-dim); stroke-width: .75; stroke-dasharray: 14 3 2 3; }
 .hotline { fill: none; stroke: var(--flag); stroke-width: 1; }
-.readout { display: grid; gap: 1rem; padding: 1rem 1.1rem 1.15rem; border-top: 1px solid #39479B; min-height: 9.5rem; }
+.readout { display: grid; gap: 1rem; padding: 1rem 1.1rem 1.15rem; border-top: 1px solid #C6CCD6; min-height: 9.5rem; }
 .readout > * { min-width: 0; }
 @media (min-width: 640px) { .readout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.5rem; } }
 .readout h2 { font: 600 1.125rem/1.25 var(--display); }
 .readout p { margin-top: .35rem; font-size: .9375rem; line-height: 1.5; color: var(--scribe); }
 .readout dl, .readout table { font: 400 .75rem/1.5 var(--mono); color: var(--scribe); }
-.readout dl div { display: flex; justify-content: space-between; gap: 1rem; border-bottom: 1px solid #39479B; padding-block: .22rem; }
+.readout dl div { display: flex; justify-content: space-between; gap: 1rem; border-bottom: 1px solid #C6CCD6; padding-block: .22rem; }
 .readout dt { color: var(--scribe-dim); white-space: nowrap; }
 .readout dd { text-align: right; }
 .readout table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-.readout th, .readout td { padding: .22rem .4rem .22rem 0; text-align: left; border-bottom: 1px solid #39479B; font-weight: 400; }
+.readout th, .readout td { padding: .22rem .4rem .22rem 0; text-align: left; border-bottom: 1px solid #C6CCD6; font-weight: 400; }
 .readout th { color: var(--scribe-dim); }
-.pass { color: #9BE8BF; }
+.pass { color: var(--ok); }
 .readout .sample { margin-top: .4rem; font: 400 .6875rem/1.4 var(--mono); color: var(--scribe-dim); }
 
 /* Page sections */
@@ -270,7 +259,7 @@ form.rfq { display: grid; gap: 1.1rem 1.25rem; background: var(--surface); borde
 <div class="plate">
   <header class="wrap topbar">
     <a class="brand" href="#main" aria-label="MDM home">
-      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="15" fill="none" stroke="#fff" stroke-width="1.5"/><circle cx="17" cy="17" r="5.5" fill="none" stroke="#FFA366" stroke-width="1.5"/><path d="M17 0v34M0 17h34" stroke="#A6B3EC" stroke-width=".75" stroke-dasharray="6 2 1 2"/></svg>
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="15" fill="none" stroke="#12161F" stroke-width="1.5"/><circle cx="17" cy="17" r="5.5" fill="none" stroke="#B5420A" stroke-width="1.5"/><path d="M17 0v34M0 17h34" stroke="#535D70" stroke-width=".75" stroke-dasharray="6 2 1 2"/></svg>
       <b>MDM</b>
       <span>Mechanical Design<br>&amp; Manufacturing</span>
     </a>
@@ -303,9 +292,9 @@ form.rfq { display: grid; gap: 1.1rem 1.25rem; background: var(--surface); borde
 
       <svg class="drawing" viewBox="0 0 640 430" role="img" aria-label="Engineering drawing of a flange with front view and section A-A">
         <defs>
-          <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#A6B3EC" stroke-width=".8"/></pattern>
-          <marker id="arr" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="9" markerHeight="5.5" orient="auto-start-reverse"><path d="M0 0L10 3L0 6z" fill="#A6B3EC"/></marker>
-          <marker id="arr-hot" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="9" markerHeight="5.5" orient="auto-start-reverse"><path d="M0 0L10 3L0 6z" fill="#FFA366"/></marker>
+          <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#535D70" stroke-width=".8"/></pattern>
+          <marker id="arr" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="9" markerHeight="5.5" orient="auto-start-reverse"><path d="M0 0L10 3L0 6z" fill="#535D70"/></marker>
+          <marker id="arr-hot" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="9" markerHeight="5.5" orient="auto-start-reverse"><path d="M0 0L10 3L0 6z" fill="#B5420A"/></marker>
           <radialGradient id="stress" gradientUnits="userSpaceOnUse" cx="190" cy="225" r="96">
             <stop offset=".33" stop-color="#F7C948"/><stop offset=".5" stop-color="#E5484D"/><stop offset=".62" stop-color="#F7C948"/><stop offset=".76" stop-color="#3FB68B"/><stop offset="1" stop-color="#2F6FE0"/>
           </radialGradient>
@@ -313,7 +302,7 @@ form.rfq { display: grid; gap: 1.1rem 1.25rem; background: var(--surface); borde
           <linearGradient id="legend" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#2F6FE0"/><stop offset=".35" stop-color="#3FB68B"/><stop offset=".7" stop-color="#F7C948"/><stop offset="1" stop-color="#E5484D"/></linearGradient>
         </defs>
 
-        <rect x="6" y="6" width="628" height="418" fill="none" stroke="#39479B"/>
+        <rect x="6" y="6" width="628" height="418" fill="none" stroke="#C6CCD6"/>
 
         <!-- Under-layers for each stage -->
         <g data-layer="simulate" class="overlay" hidden>
@@ -330,15 +319,15 @@ form.rfq { display: grid; gap: 1.1rem 1.25rem; background: var(--surface); borde
         <g>
           <circle class="geo scribe" pathLength="1" cx="190" cy="225" r="96"/>
           <circle class="geo scribe" pathLength="1" cx="190" cy="225" r="48" style="animation-delay:.1s"/>
-          <circle class="geo scribe" pathLength="1" cx="190" cy="225" r="32" fill="#111A55" style="fill:#111A55;animation-delay:.2s"/>
+          <circle class="geo scribe" pathLength="1" cx="190" cy="225" r="32" fill="#FFFFFF" style="fill:#FFFFFF;animation-delay:.2s"/>
           <circle class="center" cx="190" cy="225" r="72"/>
-          <g style="fill:#111A55">
-            <circle class="geo scribe" pathLength="1" style="fill:#111A55;animation-delay:.3s" cx="190" cy="153" r="8.8"/>
-            <circle class="geo scribe" pathLength="1" style="fill:#111A55;animation-delay:.35s" cx="252.35" cy="189" r="8.8"/>
-            <circle class="geo scribe" pathLength="1" style="fill:#111A55;animation-delay:.4s" cx="252.35" cy="261" r="8.8"/>
-            <circle class="geo scribe" pathLength="1" style="fill:#111A55;animation-delay:.45s" cx="190" cy="297" r="8.8"/>
-            <circle class="geo scribe" pathLength="1" style="fill:#111A55;animation-delay:.5s" cx="127.65" cy="261" r="8.8"/>
-            <circle class="geo scribe" pathLength="1" style="fill:#111A55;animation-delay:.55s" cx="127.65" cy="189" r="8.8"/>
+          <g style="fill:#FFFFFF">
+            <circle class="geo scribe" pathLength="1" style="fill:#FFFFFF;animation-delay:.3s" cx="190" cy="153" r="8.8"/>
+            <circle class="geo scribe" pathLength="1" style="fill:#FFFFFF;animation-delay:.35s" cx="252.35" cy="189" r="8.8"/>
+            <circle class="geo scribe" pathLength="1" style="fill:#FFFFFF;animation-delay:.4s" cx="252.35" cy="261" r="8.8"/>
+            <circle class="geo scribe" pathLength="1" style="fill:#FFFFFF;animation-delay:.45s" cx="190" cy="297" r="8.8"/>
+            <circle class="geo scribe" pathLength="1" style="fill:#FFFFFF;animation-delay:.5s" cx="127.65" cy="261" r="8.8"/>
+            <circle class="geo scribe" pathLength="1" style="fill:#FFFFFF;animation-delay:.55s" cx="127.65" cy="189" r="8.8"/>
           </g>
           <path class="center" d="M82 225H298"/>
           <path class="center" d="M190 112V338"/>
@@ -389,7 +378,7 @@ form.rfq { display: grid; gap: 1.1rem 1.25rem; background: var(--surface); borde
           <text transform="translate(573 238) rotate(-90)">Ø60</text>
 
           <path class="hotline" d="M420 298H393"/>
-          <path d="M420 298L411 293V303Z" fill="#FFA366"/>
+          <path d="M420 298L411 293V303Z" fill="#B5420A"/>
           <rect class="hotline" x="373" y="288" width="20" height="20"/>
           <text class="hot" x="379.5" y="302">A</text>
 
@@ -407,7 +396,7 @@ form.rfq { display: grid; gap: 1.1rem 1.25rem; background: var(--surface); borde
 
         <!-- Analyse: legend and peak -->
         <g data-layer="simulate" class="overlay" hidden>
-          <rect x="566" y="129" width="14" height="192" fill="url(#legend)" stroke="#A6B3EC" stroke-width=".5"/>
+          <rect x="566" y="129" width="14" height="192" fill="url(#legend)" stroke="#535D70" stroke-width=".5"/>
           <text x="586" y="133">180</text>
           <text x="586" y="197">120</text>
           <text x="586" y="261">60</text>
@@ -423,10 +412,10 @@ form.rfq { display: grid; gap: 1.1rem 1.25rem; background: var(--surface); borde
             <circle cx="190" cy="225" r="88"/><circle cx="190" cy="225" r="77"/><circle cx="190" cy="225" r="66"/><circle cx="190" cy="225" r="55"/><circle cx="190" cy="225" r="42"/>
           </g>
           <path class="hotline" d="M190 145V161M182 153H198M252.35 181V197M244.35 189H260.35M252.35 253V269M244.35 261H260.35M190 289V305M182 297H198M127.65 253V269M119.65 261H135.65M127.65 181V197M119.65 189H135.65"/>
-          <circle id="tool" r="9" fill="#FFA366" fill-opacity=".35" stroke="#FFA366" cx="0" cy="0">
+          <circle id="tool" r="9" fill="#B5420A" fill-opacity=".35" stroke="#B5420A" cx="0" cy="0">
             <animateMotion dur="9s" repeatCount="indefinite" path="M278 225A88 88 0 1 1 102 225A88 88 0 1 1 278 225"/>
           </circle>
-          <rect x="416" y="125" width="80" height="200" fill="none" stroke="#FFA366" stroke-dasharray="5 3"/>
+          <rect x="416" y="125" width="80" height="200" fill="none" stroke="#B5420A" stroke-dasharray="5 3"/>
           <text class="hot" x="416" y="116">Stock Ø125 × 50</text>
           <text class="small" x="18" y="376">N20 G00 X-44. Y0. Z2.</text>
           <text class="small" x="18" y="392">N30 G02 X-44. Y0. I44. J0. F600</text>
@@ -436,7 +425,7 @@ form.rfq { display: grid; gap: 1.1rem 1.25rem; background: var(--surface); borde
 
         <!-- Inspect: probe points -->
         <g data-layer="inspect" class="overlay" hidden>
-          <g fill="#FFA366">
+          <g fill="#B5420A">
             <circle cx="222" cy="225" r="2.6"/><circle cx="212.6" cy="247.6" r="2.6"/><circle cx="190" cy="257" r="2.6"/><circle cx="167.4" cy="247.6" r="2.6"/>
             <circle cx="158" cy="225" r="2.6"/><circle cx="167.4" cy="202.4" r="2.6"/><circle cx="190" cy="193" r="2.6"/><circle cx="212.6" cy="202.4" r="2.6"/>
             <circle cx="190" cy="153" r="2.6"/><circle cx="252.35" cy="189" r="2.6"/><circle cx="252.35" cy="261" r="2.6"/><circle cx="190" cy="297" r="2.6"/><circle cx="127.65" cy="261" r="2.6"/><circle cx="127.65" cy="189" r="2.6"/>
