@@ -4,13 +4,32 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="claude:viewport-fit-sides" content="cover">
-<title>MDM Mechanical Design</title>
+<title>MDM Mechanical Design &amp; Manufacturing</title>
 <meta name="description" content="MDM provides mechanical design, engineering analysis, manufacturing and inspection, from first sketch to measured part.">
 <link rel="canonical" href="https://m-d-m.duckdns.org/">
 <meta property="og:title" content="MDM | Mechanical Design and Manufacturing">
 <meta property="og:description" content="Mechanical design, engineering analysis, manufacturing and inspection, from first sketch to measured part.">
 <meta property="og:url" content="https://m-d-m.duckdns.org/">
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="MDM Mechanical Design & Manufacturing">
+<meta property="og:image" content="https://m-d-m.duckdns.org/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="MDM Mechanical Design and Manufacturing, with an engineering drawing of a flange">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "name": "MDM Mechanical Design & Manufacturing",
+  "alternateName": "MDM",
+  "url": "https://m-d-m.duckdns.org/",
+  "image": "https://m-d-m.duckdns.org/og-image.png",
+  "email": "mahmoudsobhyelagha@gmail.com",
+  "description": "Mechanical design, engineering analysis, reverse engineering, prototyping, manufacturing and inspection.",
+  "knowsAbout": ["Mechanical design", "CAD", "Finite element analysis", "GD&T", "Reverse engineering", "Prototyping", "CNC machining", "Sheet metal fabrication", "Casting", "Dimensional inspection"]
+}
+</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%2318246E'/%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='%23fff' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='3.5' fill='%23FF9A5C'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,6 +64,7 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 400 1.125rem/1.6 var(--body); }
 h1, h2, h3, p, ol, ul, dl, dd, figure { margin: 0; padding: 0; }
@@ -111,6 +131,11 @@ a { color: var(--accent); }
 .drawing text { font-family: var(--mono); font-size: 12.5px; fill: var(--scribe); }
 .drawing text.hot { fill: var(--flag); }
 .drawing text.small { font-size: 11px; fill: var(--scribe-dim); }
+.drawing-sec { display: none; }
+@media (max-width: 640px) {
+  .drawing-sec { display: block; width: 76%; margin-inline: auto; }
+  .frame { display: none; }
+}
 .geo { fill: none; stroke: #12161F; stroke-width: 1.5; }
 .thin { fill: none; stroke: var(--scribe-dim); stroke-width: .75; }
 .center { fill: none; stroke: var(--scribe-dim); stroke-width: .75; stroke-dasharray: 14 3 2 3; }
@@ -193,6 +218,7 @@ a { color: var(--accent); }
 .tol-axis span { position: absolute; top: .2rem; transform: translateX(-50%); white-space: nowrap; }
 .tol-axis span:first-child { transform: none; }
 .tol-axis span:last-child { transform: translateX(-100%); }
+.tol-action { margin-top: 1.25rem; }
 .tol-note { margin-top: 1.25rem; color: var(--muted); font-size: .9375rem; max-width: 46rem; }
 
 /* Materials */
@@ -301,7 +327,7 @@ form.rfq { display: grid; gap: 1.1rem 1.25rem; background: var(--surface); borde
           <linearGradient id="legend" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#2F6FE0"/><stop offset=".35" stop-color="#3FB68B"/><stop offset=".7" stop-color="#F7C948"/><stop offset="1" stop-color="#E5484D"/></linearGradient>
         </defs>
 
-        <rect x="6" y="6" width="628" height="418" fill="none" stroke="#C6CCD6"/>
+        <rect class="frame" x="6" y="6" width="628" height="418" fill="none" stroke="#C6CCD6"/>
 
         <!-- Under-layers for each stage -->
         <g data-layer="simulate" class="overlay" hidden>
@@ -430,10 +456,10 @@ form.rfq { display: grid; gap: 1.1rem 1.25rem; background: var(--surface); borde
             <circle cx="190" cy="153" r="2.6"/><circle cx="252.35" cy="189" r="2.6"/><circle cx="252.35" cy="261" r="2.6"/><circle cx="190" cy="297" r="2.6"/><circle cx="127.65" cy="261" r="2.6"/><circle cx="127.65" cy="189" r="2.6"/>
             <circle cx="420" cy="136" r="2.6"/><circle cx="420" cy="175" r="2.6"/><circle cx="420" cy="275" r="2.6"/><circle cx="420" cy="314" r="2.6"/>
           </g>
-          <path class="hotline" d="M222 225L300 142H345"/>
-          <text class="hot" x="304" y="136">Bore, 8 points</text>
+          <path class="hotline" d="M222 225L262 128H340"/>
+          <text class="hot" x="266" y="122">Bore, 8 points</text>
           <path class="hotline" d="M420 175H378"/>
-          <text class="hot" x="330" y="171">Datum A</text>
+          <text class="hot" x="372" y="171">Datum A</text>
           <text class="small" x="18" y="412">Probe points shown for illustration.</text>
         </g>
       </svg>
@@ -566,6 +592,7 @@ form.rfq { display: grid; gap: 1.1rem 1.25rem; background: var(--surface); borde
       </div>
       <div id="tol-rows"></div>
       <p class="tol-note" id="tol-note">Bars run from the tightest practical tolerance to normal shop practice, on a logarithmic scale in ± mm. This is a general guide for features up to about 100 mm. Size, material and setup all shift these ranges, so we confirm tolerances for each job.</p>
+      <div class="tol-action"><button class="btn btn-solid" type="button" id="tol-use">Use ±0.05 mm in my quote request</button></div>
     </div>
   </div>
 </section>
@@ -633,6 +660,7 @@ form.rfq { display: grid; gap: 1.1rem 1.25rem; background: var(--surface); borde
       </div>
       <div class="field"><label for="f-qty">Quantity</label><input id="f-qty" name="quantity" inputmode="numeric" placeholder="e.g. 50"></div>
       <div class="field"><label for="f-material">Material (if known)</label><input id="f-material" name="material" placeholder="e.g. 6061-T6"></div>
+      <div class="field full"><label for="f-tol">Tightest tolerance (if known)</label><input id="f-tol" name="tolerance" placeholder="e.g. ±0.05 mm"></div>
       <div class="field full"><label for="f-msg">Project description</label><textarea id="f-msg" name="message" required placeholder="What does it do, and what problem are you solving?"></textarea></div>
       <div class="form-foot">
         <button class="btn btn-solid" type="submit" id="rfq-submit">Prepare my request</button>
@@ -695,6 +723,20 @@ const CONTACT_EMAIL = "mahmoudsobhyelagha@gmail.com";
       show(tabs[(i + step + tabs.length) % tabs.length], true);
     });
   });
+  const drawing = document.querySelector('.drawing');
+  const sectionView = drawing.cloneNode(true);
+  sectionView.querySelector('defs').remove();
+  sectionView.querySelector('#tool').remove();
+  sectionView.classList.add('drawing-sec');
+  sectionView.setAttribute('viewBox', '360 45 280 355');
+  sectionView.setAttribute('aria-hidden', 'true');
+  sectionView.removeAttribute('role');
+  sectionView.removeAttribute('aria-label');
+  drawing.after(sectionView);
+  const phone = matchMedia('(max-width: 640px)');
+  const fit = () => drawing.setAttribute('viewBox', phone.matches ? '0 84 368 336' : '0 0 640 430');
+  phone.addEventListener('change', fit);
+  fit();
   show(tabs[0]);
 
   const reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -746,6 +788,7 @@ const CONTACT_EMAIL = "mahmoudsobhyelagha@gmail.com";
     const label = `±${t} mm`;
     out.textContent = label;
     range.setAttribute('aria-valuetext', label);
+    document.getElementById('tol-use').textContent = `Use ${label} in my quote request`;
     host.querySelectorAll('.tol-row').forEach(row => {
       const best = +row.dataset.best, std = +row.dataset.std;
       const kind = t >= std ? 'std' : t >= best ? 'tight' : 'off';
@@ -757,6 +800,12 @@ const CONTACT_EMAIL = "mahmoudsobhyelagha@gmail.com";
     });
   }
   range.addEventListener('input', update);
+  document.getElementById('tol-use').addEventListener('click', () => {
+    const field = document.getElementById('f-tol');
+    field.value = out.textContent;
+    field.scrollIntoView({ block: 'center', behavior: 'instant' });
+    field.focus({ preventScroll: true });
+  });
   update();
 })();
 
@@ -791,6 +840,7 @@ const CONTACT_EMAIL = "mahmoudsobhyelagha@gmail.com";
       `Service: ${d.get('service')}`,
       d.get('quantity') && `Quantity: ${d.get('quantity')}`,
       d.get('material') && `Material: ${d.get('material')}`,
+      d.get('tolerance') && `Tightest tolerance: ${d.get('tolerance')}`,
     ].filter(Boolean).join('\n') + '\n\n' + d.get('message');
     summary.textContent = text;
     result.hidden = false;
