@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>MDM 3D Part Viewer</title>
+<meta name="description" content="View, section, size and export parametric mechanical parts in 3D in your browser.">
+<link rel="canonical" href="https://m-d-m.duckdns.org/apps/part-viewer.html">
+<meta property="og:title" content="MDM 3D Part Viewer">
+<meta property="og:description" content="View, section, size and export parametric mechanical parts in 3D.">
+<meta property="og:image" content="https://m-d-m.duckdns.org/og-image.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%2318246E'/%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='%23fff' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='3.5' fill='%23FF9A5C'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Carlito:wght@400;700&family=Tinos:wght@400;700&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="top">
+  <header class="wrap topbar">
+    <a class="brand" href="../"><b>MDM</b><span>Mechanical Design<br>&amp; Manufacturing</span></a>
+    <nav class="topnav" aria-label="Main">
+      <a href="../">Home</a>
+      <a href="./">Apps</a>
+      <a href="part-viewer.html" aria-current="page">3D Part Viewer</a>
+      <a href="machining-simulator.html">Machining Simulation</a>
+      <a href="../#quote">Request a quote</a>
+    </nav>
+  </header>
+</div>
+
+<main class="wrap">
+  <div class="page-head">
+    <h1>3D Part Viewer</h1>
+    <p id="part-blurb"></p>
+  </div>
+  <div class="app">
+    <div class="stage">
+      <canvas id="view" aria-label="3D view of the selected part. Drag to rotate, scroll or pinch to zoom."></canvas>
+      <div class="stage-tools" role="group" aria-label="View direction">
+        <button class="btn btn-small" type="button" data-view="iso">Iso</button>
+        <button class="btn btn-small" type="button" data-view="front">Front</button>
+        <button class="btn btn-small" type="button" data-view="right">Right</button>
+        <button class="btn btn-small" type="button" data-view="top">Top</button>
+      </div>
+      <p class="stage-hint">Drag to rotate. Scroll or pinch to zoom. Shift-drag to pan.</p>
+    </div>
+
+    <div>
+      <section class="panel" aria-label="Part">
+        <div class="field">
+          <label for="part">Part</label>
+          <select id="part"></select>
+        </div>
+        <div id="params" class="panel-params" style="display:grid;gap:.5rem"></div>
+        <p class="alert" id="problem" role="alert"></p>
+      </section>
+
+      <section class="panel" aria-label="Display and results">
+        <h2>View and results</h2>
+        <label class="check"><input type="checkbox" id="edges" checked> Show edges</label>
+        <label class="check"><input type="checkbox" id="section"> Section view</label>
+        <div class="slider" id="section-row" hidden>
+          <label for="cut">Cut position</label>
+          <output id="cut-out" for="cut"></output>
+          <input type="range" id="cut" min="0" max="100" value="50">
+        </div>
+        <div class="field">
+          <label for="material">Material</label>
+          <select id="material">
+            <option value="2.70">Aluminium 6061-T6</option>
+            <option value="2.81">Aluminium 7075-T6</option>
+            <option value="7.85">Alloy steel 4140</option>
+            <option value="8.00">Stainless 316L</option>
+            <option value="7.10">Ductile iron</option>
+            <option value="8.90">Bearing bronze</option>
+            <option value="4.43">Titanium Ti-6Al-4V</option>
+            <option value="1.41">Acetal (POM)</option>
+            <option value="1.31">PEEK</option>
+          </select>
+        </div>
+        <dl class="data">
+          <div><dt>Volume</dt><dd id="r-vol"></dd></div>
+          <div><dt>Mass</dt><dd id="r-mass"></dd></div>
+          <div><dt>Size X × Y × Z</dt><dd id="r-size"></dd></div>
+        </dl>
+        <div class="row">
+          <button class="btn btn-solid" type="button" id="stl">Download STL</button>
+          <a class="btn" href="../#quote">Quote this part</a>
+        </div>
+        <p class="note">Models and masses are concept-level. STL files are for viewing and early checks, so confirm them in your CAD system before manufacture.</p>
+      </section>
+    </div>
+  </div>
+</main>
+
+<footer class="foot"><div class="wrap">Runs in your browser. Nothing you enter here is uploaded or saved.</div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin="anonymous"></script>
+<script src="../assets/viewer3d.js"></script>
+<script>
+(function () {
+  const $ = id => document.getElementById(id);
+  const canvas = $('view');
+  function fail(msg) {
+    canvas.parentElement.innerHTML = `<p class="stage-fail">${msg}</p>`;
+  }
+  if (!window.THREE || !window.MDM3D) return fail('The 3D library could not load. Check your connection and reload the page.');
+  const view = MDM3D.createView(canvas);
+  if (!view) return fail('This browser or device cannot show 3D graphics. Try turning on WebGL or using a different browser.');
+
+  const clip = new THREE.Plane(new THREE.Vector3(-1, 0, 0), 0);
+  const state = { part: 'flange', values: {} };
+  let group = null, geometries = [], box = null;
+
+  Object.entries(MDM3D.PARTS).forEach(([key, part]) => {
+    state.values[key] = Object.fromEntries(part.params.map(p => [p.key, p.val]));
+    $('part').add(new Option(part.name, key));
+  });
+
+  const fmt = (n, d) => n.toLocaleString('en-US', { maximumFractionDigits: d, minimumFractionDigits: d });
+
+  function results() {
+    if (!geometries.length) return;
+    const cm3 = MDM3D.volumeOf(geometries) / 1000;
+    const grams = cm3 * parseFloat($('material').value);
+    const s = box.getSize(new THREE.Vector3());
+    $('r-vol').textContent = `${fmt(cm3, 1)} cm³`;
+    $('r-mass').textContent = grams >= 1000 ? `${fmt(grams / 1000, 2)} kg` : `${fmt(grams, 0)} g`;
+    $('r-size').textContent = `${fmt(s.x, 1)} × ${fmt(s.y, 1)} × ${fmt(s.z, 1)} mm`;
+  }
+  function applyDisplay() {
+    const on = $('section').checked;
+    $('section-row').hidden = !on;
+    if (group) {
+      group.traverse(o => {
+        if (o.userData.edges) o.visible = $('edges').checked;
+        if (o.material) o.material.clippingPlanes = on ? [clip] : [];
+        if (o.material) o.material.needsUpdate = true;
+      });
+    }
+    if (box) {
+      const x = box.min.x + (box.max.x - box.min.x) * $('cut').value / 100;
+      clip.constant = x;
+      $('cut-out').textContent = `X = ${fmt(x, 1)} mm`;
+    }
+    view.invalidate();
+  }
+  function rebuild(refit) {
+    const part = MDM3D.PARTS[state.part];
+    let next;
+    try {
+      next = part.build(state.values[state.part]);
+      $('problem').textContent = '';
+    } catch (err) {
+      $('problem').textContent = err.message;
+      $('stl').disabled = true;
+      return;
+    }
+    $('stl').disabled = false;
+    if (group) {
+      view.scene.remove(group);
+      MDM3D.disposeGroup(group);
+    }
+    geometries = next;
+    group = MDM3D.partGroup(geometries);
+    view.scene.add(group);
+    box = MDM3D.boxOf(geometries);
+    applyDisplay();
+    results();
+    if (refit) view.frame(box);
+    view.invalidate();
+  }
+  function controls() {
+    const part = MDM3D.PARTS[state.part];
+    $('part-blurb').textContent = `${part.blurb} Change its sizes, cut a section and read its mass.`;
+    const host = $('params');
+    host.innerHTML = '';
+    part.params.forEach(p => {
+      const row = document.createElement('div');
+      row.className = 'slider';
+      const id = `p-${state.part}-${p.key}`;
+      const label = document.createElement('label');
+      label.htmlFor = id;
+      label.textContent = p.label;
+      const out = document.createElement('output');
+      out.htmlFor = id;
+      const input = document.createElement('input');
+      Object.assign(input, { type: 'range', id, min: p.min, max: p.max, step: p.step, value: state.values[state.part][p.key] });
+      const unit = p.key === 'holes' || p.key === 'z' ? '' : p.key === 'm' ? '' : ' mm';
+      const show = () => { out.textContent = `${input.value}${unit}`; };
+      input.addEventListener('input', () => {
+        state.values[state.part][p.key] = parseFloat(input.value);
+        show();
+        rebuild(false);
+      });
+      show();
+      row.append(label, out, input);
+      host.append(row);
+    });
+  }
+
+  $('part').addEventListener('change', () => {
+    state.part = $('part').value;
+    controls();
+    rebuild(true);
+  });
+  $('material').addEventListener('change', results);
+  $('edges').addEventListener('change', applyDisplay);
+  $('section').addEventListener('change', applyDisplay);
+  $('cut').addEventListener('input', applyDisplay);
+  document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => view.setView(b.dataset.view)));
+  $('stl').addEventListener('click', () => {
+    const url = URL.createObjectURL(new Blob([MDM3D.toSTL(geometries)], { type: 'model/stl' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `mdm-${state.part}.stl`;
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
+
+  controls();
+  rebuild(true);
+  window.addEventListener('resize', () => box && view.frame(box), { once: true });
+  window.mdmViewer = { getVolume: () => MDM3D.volumeOf(geometries), setPart: k => { $('part').value = k; $('part').dispatchEvent(new Event('change')); } };
+})();
+</script>
+</body>
+</html>

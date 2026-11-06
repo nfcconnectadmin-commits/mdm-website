@@ -118,7 +118,7 @@ a { color: var(--accent); }
 
 /* Drawing */
 .sheet { background: var(--dykem-deep); border: 1px solid #C6CCD6; }
-.stages { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid #C6CCD6; }
+.stages { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-bottom: 1px solid #C6CCD6; }
 .stages button {
   appearance: none; background: transparent; border: 0; border-right: 1px solid #C6CCD6; color: var(--scribe-dim);
   padding: .7rem .25rem; font: 500 .9375rem/1.2 var(--mono); cursor: pointer;
@@ -136,6 +136,11 @@ a { color: var(--accent); }
   .drawing-sec { display: block; width: 76%; margin-inline: auto; }
   .frame { display: none; }
 }
+.drawing.off { display: none !important; }
+.flange3d { position: relative; background: #fff; }
+.flange3d canvas { display: block; width: 100%; aspect-ratio: 640 / 430; touch-action: none; cursor: grab; }
+.flange-msg { position: absolute; left: .75rem; bottom: .5rem; font-size: .875rem; color: var(--muted); }
+.readout .inline-link { color: var(--accent); }
 .geo { fill: none; stroke: #12161F; stroke-width: 1.5; }
 .thin { fill: none; stroke: var(--scribe-dim); stroke-width: .75; }
 .center { fill: none; stroke: var(--scribe-dim); stroke-width: .75; stroke-dasharray: 14 3 2 3; }
@@ -171,6 +176,8 @@ a { color: var(--accent); }
 .svc h3 { font: 600 1.375rem/1.2 var(--display); }
 .svc p { color: var(--muted); max-width: 38rem; }
 .svc .gets { font: 400 .9375rem/1.55 var(--mono); }
+.svc h3 a { color: inherit; }
+.svc h3 a:hover { color: var(--accent); }
 .svc .gets b { display: block; font-weight: 500; color: var(--callout); margin-bottom: .1rem; }
 
 /* Process */
@@ -290,6 +297,7 @@ form.rfq { display: grid; gap: 1.1rem 1.25rem; background: var(--surface); borde
     </a>
     <nav class="topnav" aria-label="Main">
       <a href="#services">Services</a>
+      <a href="#apps">Apps</a>
       <a href="#process">Process</a>
       <a href="#tolerances">Tolerance guide</a>
       <a href="#materials">Materials</a>
@@ -313,6 +321,7 @@ form.rfq { display: grid; gap: 1.1rem 1.25rem; background: var(--surface); borde
         <button type="button" role="tab" id="tab-simulate" aria-controls="readout" aria-selected="false" tabindex="-1" data-stage="simulate">Analyse</button>
         <button type="button" role="tab" id="tab-machine" aria-controls="readout" aria-selected="false" tabindex="-1" data-stage="machine">Machine</button>
         <button type="button" role="tab" id="tab-inspect" aria-controls="readout" aria-selected="false" tabindex="-1" data-stage="inspect">Inspect</button>
+        <button type="button" role="tab" id="tab-3d" aria-controls="readout" aria-selected="false" tabindex="-1" data-stage="view3d">3D</button>
       </div>
 
       <svg class="drawing" viewBox="0 0 640 430" role="img" aria-label="Engineering drawing of a flange with front view and section A-A">
@@ -464,6 +473,8 @@ form.rfq { display: grid; gap: 1.1rem 1.25rem; background: var(--surface); borde
         </g>
       </svg>
 
+      <div class="flange3d" id="flange3d" hidden><canvas id="flange-canvas" aria-label="3D model of the flange. Drag to rotate."></canvas><p id="flange-msg" class="flange-msg"></p></div>
+
       <div class="readout" id="readout" role="tabpanel" aria-live="polite" aria-labelledby="tab-design">
         <div data-panel="design">
           <h2>Tolerance what matters</h2>
@@ -475,6 +486,17 @@ form.rfq { display: grid; gap: 1.1rem 1.25rem; background: var(--surface); borde
           <div><dt>Datum face</dt><dd>Flatness 0.02</dd></div>
           <div><dt>General tolerances</dt><dd>ISO 2768-mK</dd></div>
         </dl>
+        <div data-panel="view3d" hidden>
+          <h2>Turn the drawing into a part</h2>
+          <p>This is the same flange at the same sizes, as a live 3D model. Drag it to look around.</p>
+        </div>
+        <div data-panel="view3d" hidden>
+          <dl>
+            <div><dt>Overall size</dt><dd>Ø120 × 45 mm</dd></div>
+            <div><dt>Material</dt><dd>6061-T6</dd></div>
+          </dl>
+          <p style="margin-top:.6rem"><a class="inline-link" href="apps/part-viewer.html">Open the 3D Part Viewer</a></p>
+        </div>
         <div data-panel="simulate" hidden>
           <h2>Find the weak point early</h2>
           <p>Analysis shows where load concentrates, so a fillet or wall change happens in CAD, well before anyone cuts metal.</p>
@@ -553,6 +575,32 @@ form.rfq { display: grid; gap: 1.1rem 1.25rem; background: var(--surface); borde
         <h3>Inspection and documentation</h3>
         <p>Dimensional inspection against the released drawing, first-article reports and material records, so every critical feature has evidence behind it.</p>
         <div class="gets"><b>You receive</b>Inspection report and material certificates where supplied</div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="band" id="apps">
+  <div class="wrap">
+    <div class="sect-head">
+      <h2>Engineering apps you can use now</h2>
+      <p>Free tools that run in your browser, with nothing to install. <a href="apps/">See the full app list</a>.</p>
+    </div>
+    <ul class="svc">
+      <li>
+        <h3><a href="apps/machining-simulator.html">3D Machining Simulation</a></h3>
+        <p>Watch a 3-axis milling program cut a block. Run a sample job or paste your own G-code, then check the cycle time, material removed and rapid collisions.</p>
+        <div class="gets"><a class="btn btn-solid" href="apps/machining-simulator.html">Open app</a></div>
+      </li>
+      <li>
+        <h3><a href="apps/part-viewer.html">3D Part Viewer</a></h3>
+        <p>Rotate a flange, shaft, gear or bracket in 3D. Change its sizes, cut a section, read its mass and download an STL.</p>
+        <div class="gets"><a class="btn btn-solid" href="apps/part-viewer.html">Open app</a></div>
+      </li>
+      <li>
+        <h3><a href="apps/cutting-data.html">Cutting Data Calculator</a></h3>
+        <p>Work out spindle speed, feed rate, metal removal rate and cutting power, with starting values for common materials.</p>
+        <div class="gets"><a class="btn btn-solid" href="apps/cutting-data.html">Open app</a></div>
       </li>
     </ul>
   </div>
@@ -693,6 +741,38 @@ form.rfq { display: grid; gap: 1.1rem 1.25rem; background: var(--surface); borde
 /* Set this to the address that should receive quote requests. */
 const CONTACT_EMAIL = "mahmoudsobhyelagha@gmail.com";
 
+/* 3D flange: the library only loads when someone opens the 3D tab. */
+let flangeStarted = false;
+function loadScript(src, integrity) {
+  return new Promise((resolve, reject) => {
+    const el = document.createElement('script');
+    el.src = src;
+    if (integrity) { el.integrity = integrity; el.crossOrigin = 'anonymous'; }
+    el.onload = resolve;
+    el.onerror = reject;
+    document.head.append(el);
+  });
+}
+function openFlange() {
+  if (flangeStarted) return;
+  flangeStarted = true;
+  const msg = document.getElementById('flange-msg');
+  msg.textContent = 'Loading 3D model';
+  loadScript('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js', 'sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu')
+    .then(() => loadScript('assets/viewer3d.js'))
+    .then(() => {
+      const view = MDM3D.createView(document.getElementById('flange-canvas'));
+      if (!view) { msg.textContent = 'This device cannot show 3D graphics.'; return; }
+      const part = MDM3D.PARTS.flange;
+      const geos = part.build(Object.fromEntries(part.params.map(p => [p.key, p.val])));
+      view.scene.add(MDM3D.partGroup(geos));
+      view.resize();
+      view.frame(MDM3D.boxOf(geos));
+      msg.textContent = 'Drag to rotate. Scroll or pinch to zoom.';
+    })
+    .catch(() => { msg.textContent = 'The 3D model could not load. Check your connection and reload the page.'; });
+}
+
 /* Stage switcher */
 (function () {
   const tabs = [...document.querySelectorAll('.stages [role="tab"]')];
@@ -711,6 +791,9 @@ const CONTACT_EMAIL = "mahmoudsobhyelagha@gmail.com";
       el.style.display = on ? '' : 'none';
     });
     document.querySelectorAll('[data-panel]').forEach(el => { el.hidden = el.dataset.panel !== stage; });
+    document.querySelectorAll('.sheet .drawing').forEach(el => el.classList.toggle('off', stage === 'view3d'));
+    document.getElementById('flange3d').hidden = stage !== 'view3d';
+    if (stage === 'view3d') openFlange();
     panel.setAttribute('aria-labelledby', tab.id);
     if (focus) tab.focus();
   }

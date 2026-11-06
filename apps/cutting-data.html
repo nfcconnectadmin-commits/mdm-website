@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>MDM Cutting Data Calculator</title>
+<meta name="description" content="Work out spindle speed, feed rate, metal removal rate and cutting power for milling.">
+<link rel="canonical" href="https://m-d-m.duckdns.org/apps/cutting-data.html">
+<meta property="og:title" content="MDM Cutting Data Calculator">
+<meta property="og:description" content="Work out spindle speed, feed rate, metal removal rate and cutting power for milling.">
+<meta property="og:image" content="https://m-d-m.duckdns.org/og-image.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%2318246E'/%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='%23fff' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='3.5' fill='%23FF9A5C'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Carlito:wght@400;700&family=Tinos:wght@400;700&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="top">
+  <header class="wrap topbar">
+    <a class="brand" href="../"><b>MDM</b><span>Mechanical Design<br>&amp; Manufacturing</span></a>
+    <nav class="topnav" aria-label="Main">
+      <a href="../">Home</a>
+      <a href="./">Apps</a>
+      <a href="part-viewer.html">3D Part Viewer</a>
+      <a href="machining-simulator.html">Machining Simulation</a>
+      <a href="../#quote">Request a quote</a>
+    </nav>
+  </header>
+</div>
+
+<main class="wrap">
+  <div class="page-head">
+    <h1>Cutting Data Calculator</h1>
+    <p>Work out milling speed, feed, metal removal rate and cutting power. Pick a material to load typical starting values for a coated carbide end mill, then adjust them to suit your tool.</p>
+  </div>
+  <div class="calc">
+    <form class="panel" id="form" aria-label="Cutting inputs">
+      <h2>Inputs</h2>
+      <div class="field">
+        <label for="material">Material</label>
+        <select id="material"></select>
+      </div>
+      <div class="twoup">
+        <div class="field"><label for="d">Tool diameter, mm</label><input id="d" type="number" min="0.1" step="0.1" value="10"></div>
+        <div class="field"><label for="z">Flutes</label><input id="z" type="number" min="1" step="1" value="3"></div>
+        <div class="field"><label for="vc">Cutting speed Vc, m/min</label><input id="vc" type="number" min="1" step="1"></div>
+        <div class="field"><label for="fz">Feed per tooth fz, mm</label><input id="fz" type="number" min="0.001" step="0.005"></div>
+        <div class="field"><label for="ap">Depth of cut ap, mm</label><input id="ap" type="number" min="0.01" step="0.1" value="5"></div>
+        <div class="field"><label for="ae">Width of cut ae, mm</label><input id="ae" type="number" min="0.01" step="0.1" value="4"></div>
+      </div>
+      <p class="alert" id="problem" role="alert"></p>
+    </form>
+
+    <section class="panel" aria-label="Results" aria-live="polite">
+      <h2>Results</h2>
+      <dl class="data">
+        <div><dt>Spindle speed</dt><dd id="r-n"></dd></div>
+        <div><dt>Feed rate</dt><dd id="r-vf"></dd></div>
+        <div><dt>Metal removal rate</dt><dd id="r-q"></dd></div>
+        <div><dt>Cutting power, before machine losses</dt><dd id="r-p"></dd></div>
+        <div><dt>Time to cut 100 mm</dt><dd id="r-t"></dd></div>
+      </dl>
+      <p class="formula">n = 1000 × Vc ÷ (π × D). Vf = fz × z × n. Q = ap × ae × Vf ÷ 1000. P = Q × kc ÷ 60,000, using a typical specific cutting force for the material (<span id="r-kc"></span>).</p>
+      <p class="note">Default values are general starting points, not guarantees. Tool maker data, machine rigidity and setup come first, so start conservatively and adjust from there.</p>
+      <div class="row">
+        <a class="btn" href="machining-simulator.html">Open Machining Simulation</a>
+        <a class="btn" href="../#quote">Request a quote</a>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="foot"><div class="wrap">Runs in your browser. Nothing you enter here is uploaded or saved.</div></footer>
+
+<script>
+(function () {
+  const $ = id => document.getElementById(id);
+  /* name, Vc m/min, fz mm, kc N/mm² */
+  const MATERIALS = [
+    ['Aluminium 6061-T6', 300, 0.08, 700],
+    ['Aluminium 7075-T6', 280, 0.08, 800],
+    ['Alloy steel 4140', 120, 0.05, 2100],
+    ['Stainless 316L', 80, 0.04, 2500],
+    ['Ductile iron', 130, 0.06, 1500],
+    ['Bearing bronze', 180, 0.06, 900],
+    ['Titanium Ti-6Al-4V', 50, 0.04, 1800],
+    ['Acetal (POM)', 300, 0.10, 300],
+  ];
+  MATERIALS.forEach((m, i) => $('material').add(new Option(m[0], i)));
+  const num = id => parseFloat($(id).value);
+  const fmt = (v, d) => v.toLocaleString('en-US', { maximumFractionDigits: d, minimumFractionDigits: d });
+  function calc() {
+    const m = MATERIALS[+$('material').value];
+    const [d, z, vc, fz, ap, ae] = ['d', 'z', 'vc', 'fz', 'ap', 'ae'].map(num);
+    const ids = ['r-n', 'r-vf', 'r-q', 'r-p', 'r-t'];
+    if (![d, z, vc, fz, ap, ae].every(v => v > 0)) {
+      $('problem').textContent = 'Enter a value above zero in every box.';
+      ids.forEach(id => { $(id).textContent = '–'; });
+      return;
+    }
+    $('problem').textContent = ae > d ? 'Width of cut is larger than the tool diameter, so this takes more than one pass.' : '';
+    const n = 1000 * vc / (Math.PI * d);
+    const vf = fz * z * n;
+    const q = ap * ae * vf / 1000;
+    const p = q * m[3] / 60000;
+    $('r-n').textContent = `${fmt(n, 0)} rpm`;
+    $('r-vf').textContent = `${fmt(vf, 0)} mm/min`;
+    $('r-q').textContent = `${fmt(q, 1)} cm³/min`;
+    $('r-p').textContent = `${fmt(p, 2)} kW`;
+    $('r-t').textContent = `${fmt(100 / vf * 60, 1)} s`;
+    $('r-kc').textContent = `${fmt(m[3], 0)} N/mm²`;
+  }
+  function loadMaterial() {
+    const m = MATERIALS[+$('material').value];
+    $('vc').value = m[1];
+    $('fz').value = m[2];
+    calc();
+  }
+  $('material').addEventListener('change', loadMaterial);
+  $('form').addEventListener('input', e => { if (e.target.id !== 'material') calc(); });
+  $('form').addEventListener('submit', e => e.preventDefault());
+  loadMaterial();
+})();
+</script>
+</body>
+</html>

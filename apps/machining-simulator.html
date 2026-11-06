@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>MDM 3D Machining Simulation</title>
+<meta name="description" content="Watch a milling program cut a block in 3D, in your browser. Run sample jobs or paste your own G-code.">
+<link rel="canonical" href="https://m-d-m.duckdns.org/apps/machining-simulator.html">
+<meta property="og:title" content="MDM 3D Machining Simulation">
+<meta property="og:description" content="Watch a milling program cut a block in 3D. Run sample jobs or paste your own G-code.">
+<meta property="og:image" content="https://m-d-m.duckdns.org/og-image.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%2318246E'/%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='%23fff' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='3.5' fill='%23FF9A5C'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Carlito:wght@400;700&family=Tinos:wght@400;700&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="top">
+  <header class="wrap topbar">
+    <a class="brand" href="../"><b>MDM</b><span>Mechanical Design<br>&amp; Manufacturing</span></a>
+    <nav class="topnav" aria-label="Main">
+      <a href="../">Home</a>
+      <a href="./">Apps</a>
+      <a href="part-viewer.html">3D Part Viewer</a>
+      <a href="machining-simulator.html" aria-current="page">Machining Simulation</a>
+      <a href="../#quote">Request a quote</a>
+    </nav>
+  </header>
+</div>
+
+<main class="wrap">
+  <div class="page-head">
+    <h1>3D Machining Simulation</h1>
+    <p>Watch a 3-axis milling program remove material from a block. Run a sample job or paste your own G-code to see the cut, the cycle time and any rapid moves that hit the stock.</p>
+  </div>
+  <div class="app">
+    <div>
+      <div class="stage">
+        <canvas id="view" aria-label="3D view of the tool cutting the stock. Drag to rotate, scroll or pinch to zoom."></canvas>
+        <div class="stage-tools" role="group" aria-label="View direction">
+          <button class="btn btn-small" type="button" data-view="iso">Iso</button>
+          <button class="btn btn-small" type="button" data-view="front">Front</button>
+          <button class="btn btn-small" type="button" data-view="top">Top</button>
+        </div>
+        <p class="stage-hint">Drag to rotate. Scroll or pinch to zoom. Shift-drag to pan.</p>
+      </div>
+      <div class="bar" aria-hidden="true"><i id="progress"></i></div>
+      <p class="now" id="now" aria-live="off"></p>
+      <div class="legend" id="legend" style="margin-top:.5rem"></div>
+    </div>
+
+    <div>
+      <section class="panel" aria-label="Run the simulation">
+        <div class="field">
+          <label for="job">Sample job</label>
+          <select id="job"></select>
+        </div>
+        <div class="row">
+          <button class="btn btn-solid" type="button" id="play">Play</button>
+          <button class="btn" type="button" id="restart">Restart</button>
+          <button class="btn" type="button" id="finish">Skip to end</button>
+        </div>
+        <div class="field">
+          <label for="speed">Simulation speed</label>
+          <select id="speed">
+            <option value="1">1× real time</option>
+            <option value="5">5×</option>
+            <option value="20" selected>20×</option>
+            <option value="60">60×</option>
+            <option value="200">200×</option>
+          </select>
+        </div>
+        <label class="check"><input type="checkbox" id="show-path"> Show toolpath</label>
+        <label class="check"><input type="checkbox" id="show-tool" checked> Show tool</label>
+      </section>
+
+      <section class="panel" aria-label="Machine status">
+        <h2>Machine status</h2>
+        <dl class="data">
+          <div><dt>Operation</dt><dd id="r-op"></dd></div>
+          <div><dt>Tool</dt><dd id="r-tool"></dd></div>
+          <div><dt>Feed</dt><dd id="r-feed"></dd></div>
+          <div><dt>Spindle</dt><dd id="r-speed"></dd></div>
+          <div><dt>Position</dt><dd id="r-pos"></dd></div>
+          <div><dt>Cycle time</dt><dd id="r-time"></dd></div>
+          <div><dt>Material removed</dt><dd id="r-vol"></dd></div>
+          <div><dt>Chips by mass</dt><dd id="r-mass"></dd></div>
+          <div><dt>Rapid collisions</dt><dd id="r-crash"></dd></div>
+        </dl>
+        <p class="alert" id="crash-note" role="alert"></p>
+        <div class="field">
+          <label for="material">Material</label>
+          <select id="material">
+            <option value="2.70">Aluminium 6061-T6</option>
+            <option value="2.81">Aluminium 7075-T6</option>
+            <option value="7.85">Alloy steel 4140</option>
+            <option value="8.00">Stainless 316L</option>
+            <option value="7.10">Ductile iron</option>
+            <option value="8.90">Bearing bronze</option>
+            <option value="4.43">Titanium Ti-6Al-4V</option>
+            <option value="1.41">Acetal (POM)</option>
+          </select>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <section class="panel" aria-labelledby="gcode-title" style="margin-bottom:2.5rem">
+    <h2 id="gcode-title">G-code program</h2>
+    <p class="note">Edit this program or paste your own, then click Run. The block is 120 × 80 × 31 mm with X0 Y0 at its front-left corner and Z0 at the finished top. Use millimetres and absolute moves: G0, G1, and G2 or G3 with I and J. Tools: <span id="tool-list"></span>. Select one with, for example, T1 M6.</p>
+    <div class="field">
+      <label for="gcode">Program</label>
+      <textarea id="gcode" spellcheck="false" autocomplete="off"></textarea>
+    </div>
+    <p class="alert" id="gcode-problem" role="alert"></p>
+    <div class="row"><button class="btn btn-solid" type="button" id="run-code">Run this program</button></div>
+    <p class="note">This is a visual check and a learning tool. Cycle time counts only tool moves, at an assumed 6,000 mm/min rapid. It ignores acceleration, tool changes, cutting forces, and holder or fixture collisions. The sample programs are examples only, so verify any program in your CAM system and on your machine before cutting.</p>
+  </section>
+</main>
+
+<footer class="foot"><div class="wrap">Runs in your browser. Your G-code is not uploaded or saved.</div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin="anonymous"></script>
+<script src="../assets/viewer3d.js"></script>
+<script src="../assets/machining.js"></script>
+</body>
+</html>
