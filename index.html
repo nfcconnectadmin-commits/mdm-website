@@ -1,0 +1,837 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>MDM Mechanical Design</title>
+<meta name="description" content="MDM provides mechanical design, engineering analysis, manufacturing and inspection, from first sketch to measured part.">
+<link rel="canonical" href="https://m-d-m.duckdns.org/">
+<meta property="og:title" content="MDM | Mechanical Design and Manufacturing">
+<meta property="og:description" content="Mechanical design, engineering analysis, manufacturing and inspection, from first sketch to measured part.">
+<meta property="og:url" content="https://m-d-m.duckdns.org/">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%2318246E'/%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='%23fff' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='3.5' fill='%23FF9A5C'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout concept: a steel plate coated in layout fluid opens the page with one scribed part;
+   below it, the site reads as an engineering data sheet that ends in a drawing title block. */
+:root {
+  --bg: #EDEFF2;
+  --surface: #F8F9FB;
+  --ink: #12161F;
+  --muted: #535D70;
+  --rule: #C6CCD6;
+  --accent: #2A3CB8;
+  --callout: #B5420A;
+  --ok: #17693F;
+  --warn: #8A5A00;
+  --off: #697386;
+  --bar: #2A3CB8;
+
+  /* The layout-fluid band keeps one look in both themes. */
+  --dykem: #18246E;
+  --dykem-deep: #111A55;
+  --scribe: #E4EAFF;
+  --scribe-dim: #A6B3EC;
+  --flag: #FFA366;
+
+  --display: "Archivo", "Arial Narrow", Arial, sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+  --mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F1320; --surface: #171C2C; --ink: #E8ECF4; --muted: #A1ABBF; --rule: #2F374C;
+    --accent: #A3AFFF; --callout: #FFA366; --ok: #6FD6A0; --warn: #E9BE63; --off: #8791A6; --bar: #7F8FFF;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F1320; --surface: #171C2C; --ink: #E8ECF4; --muted: #A1ABBF; --rule: #2F374C;
+  --accent: #A3AFFF; --callout: #FFA366; --ok: #6FD6A0; --warn: #E9BE63; --off: #8791A6; --bar: #7F8FFF;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 1.0625rem/1.6 var(--body); }
+h1, h2, h3, p, ol, ul, dl, dd, figure { margin: 0; padding: 0; }
+ol, ul { list-style: none; }
+a { color: var(--accent); }
+:focus-visible { outline: 3px solid var(--callout); outline-offset: 2px; }
+.wrap {
+  width: 100%; max-width: 78rem; margin-inline: auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+@media (min-width: 720px) {
+  .wrap {
+    padding-left: max(32px, env(safe-area-inset-left, 0px));
+    padding-right: max(32px, env(safe-area-inset-right, 0px));
+  }
+}
+.mono { font-family: var(--mono); font-size: .8125rem; letter-spacing: .01em; }
+.skip { position: absolute; left: -999px; top: 8px; background: #fff; color: #111; padding: .5rem 1rem; z-index: 5; }
+.skip:focus { left: 16px; }
+
+/* Plate: header and hero */
+.plate { background: var(--dykem); color: #fff; }
+.topbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem 2rem; padding-block: 1.1rem; }
+.brand { display: flex; align-items: center; gap: .7rem; color: #fff; text-decoration: none; }
+.brand b { font: 800 1.5rem/1 var(--display); font-stretch: 125%; letter-spacing: .03em; }
+.brand span { font: 400 .75rem/1.25 var(--mono); color: var(--scribe-dim); }
+.topnav { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem 1.5rem; }
+.topnav a { color: var(--scribe); font-size: .9375rem; text-decoration: none; padding-block: .35rem; }
+.topnav a:hover { color: #fff; text-decoration: underline; text-underline-offset: 4px; }
+:where(.plate) :focus-visible { outline-color: var(--flag); }
+
+.hero { display: grid; gap: 2rem; padding-block: 2rem 3rem; align-items: center; }
+.hero > * { min-width: 0; }
+@media (min-width: 1000px) {
+  .hero { grid-template-columns: minmax(0, 5fr) minmax(0, 8fr); gap: 3.5rem; padding-block: 2.5rem 4rem; }
+}
+.hero h1 {
+  font: 700 clamp(2.5rem, 5.4vw, 4.25rem)/1.02 var(--display);
+  font-stretch: 85%; letter-spacing: -.01em; text-wrap: balance;
+}
+.hero p { margin-top: 1.25rem; max-width: 34rem; color: var(--scribe); font-size: 1.125rem; }
+.actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.75rem; }
+.btn {
+  display: inline-block; padding: .8rem 1.3rem; border: 1px solid transparent; border-radius: 2px;
+  font: 600 1rem/1.2 var(--body); text-decoration: none; cursor: pointer;
+}
+.btn-flag { background: var(--flag); color: #1B1005; }
+.btn-flag:hover { background: #FFB887; }
+.btn-line { border-color: var(--scribe-dim); color: #fff; background: transparent; }
+.btn-line:hover { background: var(--dykem-deep); }
+
+/* Drawing */
+.sheet { background: var(--dykem-deep); border: 1px solid #39479B; }
+.stages { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid #39479B; }
+.stages button {
+  appearance: none; background: transparent; border: 0; border-right: 1px solid #39479B; color: var(--scribe-dim);
+  padding: .7rem .25rem; font: 500 .8125rem/1.2 var(--mono); cursor: pointer;
+}
+.stages button:last-child { border-right: 0; }
+.stages button:hover { color: #fff; }
+.stages button[aria-selected="true"] { background: var(--dykem); color: #fff; box-shadow: inset 0 -3px 0 var(--flag); }
+.stages button:focus-visible { outline-offset: -3px; }
+.drawing { display: block; width: 100%; height: auto; }
+.drawing text { font-family: var(--mono); font-size: 11px; fill: var(--scribe); }
+.drawing text.hot { fill: var(--flag); }
+.drawing text.small { font-size: 9.5px; fill: var(--scribe-dim); }
+.geo { fill: none; stroke: #fff; stroke-width: 1.5; }
+.thin { fill: none; stroke: var(--scribe-dim); stroke-width: .75; }
+.center { fill: none; stroke: var(--scribe-dim); stroke-width: .75; stroke-dasharray: 14 3 2 3; }
+.hotline { fill: none; stroke: var(--flag); stroke-width: 1; }
+.readout { display: grid; gap: 1rem; padding: 1rem 1.1rem 1.15rem; border-top: 1px solid #39479B; min-height: 9.5rem; }
+.readout > * { min-width: 0; }
+@media (min-width: 640px) { .readout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.5rem; } }
+.readout h2 { font: 600 1.125rem/1.25 var(--display); }
+.readout p { margin-top: .35rem; font-size: .9375rem; line-height: 1.5; color: var(--scribe); }
+.readout dl, .readout table { font: 400 .75rem/1.5 var(--mono); color: var(--scribe); }
+.readout dl div { display: flex; justify-content: space-between; gap: 1rem; border-bottom: 1px solid #39479B; padding-block: .22rem; }
+.readout dt { color: var(--scribe-dim); white-space: nowrap; }
+.readout dd { text-align: right; }
+.readout table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.readout th, .readout td { padding: .22rem .4rem .22rem 0; text-align: left; border-bottom: 1px solid #39479B; font-weight: 400; }
+.readout th { color: var(--scribe-dim); }
+.pass { color: #9BE8BF; }
+.readout .sample { margin-top: .4rem; font: 400 .6875rem/1.4 var(--mono); color: var(--scribe-dim); }
+
+/* Page sections */
+.band { padding-block: clamp(3rem, 7vw, 5.5rem); border-bottom: 1px solid var(--rule); }
+.sect-head { display: grid; gap: .75rem; margin-bottom: 2.25rem; }
+.sect-head > * { min-width: 0; }
+@media (min-width: 900px) { .sect-head { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 3rem; align-items: end; } }
+.sect-head h2 { font: 700 clamp(2rem, 3.8vw, 3rem)/1.05 var(--display); font-stretch: 85%; text-wrap: balance; }
+.sect-head p { color: var(--muted); max-width: 40rem; }
+
+/* Services data sheet */
+.svc { border-top: 2px solid var(--ink); }
+.svc li { display: grid; gap: .6rem 2.5rem; padding-block: 1.5rem; border-bottom: 1px solid var(--rule); }
+.svc li > * { min-width: 0; }
+@media (min-width: 900px) { .svc li { grid-template-columns: minmax(0, 3.5fr) minmax(0, 5fr) minmax(0, 3.5fr); } }
+.svc h3 { font: 600 1.375rem/1.2 var(--display); }
+.svc p { color: var(--muted); max-width: 38rem; }
+.svc .gets { font: 400 .8125rem/1.55 var(--mono); }
+.svc .gets b { display: block; font-weight: 500; color: var(--callout); margin-bottom: .1rem; }
+
+/* Process */
+.steps { display: grid; gap: 0; counter-reset: step; }
+@media (min-width: 640px) { .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1000px) { .steps { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+.steps li { counter-increment: step; position: relative; padding: 2.4rem 1.25rem 1.5rem 0; border-top: 2px solid var(--accent); min-width: 0; }
+.steps li::before {
+  content: counter(step); position: absolute; top: -.85rem; left: 0; width: 1.6rem; height: 1.6rem;
+  display: grid; place-items: center; background: var(--accent); color: var(--bg);
+  font: 500 .8125rem/1 var(--mono); border-radius: 50%;
+}
+.steps h3 { font: 600 1.125rem/1.2 var(--display); }
+.steps p { margin-top: .45rem; color: var(--muted); font-size: .9375rem; line-height: 1.5; }
+.steps .gate { display: block; margin-top: .7rem; font: 400 .75rem/1.4 var(--mono); color: var(--callout); }
+
+/* Tolerance guide */
+.tol-panel { background: var(--surface); border: 1px solid var(--rule); padding: clamp(1rem, 2.5vw, 2rem); }
+.tol-control { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1.5rem; margin-bottom: 1.5rem; }
+.tol-control label { font-weight: 600; }
+.tol-control input { flex: 1 1 14rem; min-width: 0; accent-color: var(--accent); height: 1.75rem; }
+.tol-control output { font: 500 1.5rem/1 var(--mono); color: var(--accent); min-width: 7.5rem; text-align: right; }
+.tol-row { display: grid; gap: .2rem 1.25rem; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "name state" "track track" "meta meta"; padding-block: .7rem; border-top: 1px solid var(--rule); align-items: center; }
+.tol-row.is-off .tol-name { color: var(--off); }
+.tol-axis-row { display: grid; grid-template-columns: minmax(0, 1fr); padding-bottom: 1.5rem; }
+@media (min-width: 860px) {
+  .tol-row { grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) 11rem; grid-template-areas: "name track state" "meta track state"; padding-block: .45rem; }
+  .tol-axis-row { grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) 11rem; column-gap: 1.25rem; }
+  .tol-axis { grid-column: 2; }
+}
+.tol-name { grid-area: name; font-weight: 500; line-height: 1.3; }
+.tol-meta { grid-area: meta; font: 400 .75rem/1.4 var(--mono); color: var(--muted); }
+.tol-state { grid-area: state; font: 500 .75rem/1.3 var(--mono); display: inline-flex; align-items: center; gap: .4rem; justify-self: end; text-align: right; }
+@media (min-width: 860px) { .tol-state { justify-self: start; text-align: left; } }
+.tol-state i { width: .6rem; height: .6rem; flex: none; border: 1.5px solid currentColor; }
+.st-std { color: var(--ok); } .st-std i { background: currentColor; }
+.st-tight { color: var(--warn); } .st-tight i { background: linear-gradient(135deg, currentColor 50%, transparent 50%); }
+.st-off { color: var(--off); }
+.tol-track { grid-area: track; position: relative; height: 1.5rem; background-image: linear-gradient(90deg, var(--rule) 1px, transparent 1px); background-size: 25% 100%; border-right: 1px solid var(--rule); }
+.tol-bar { position: absolute; top: .375rem; height: .75rem; background: var(--bar); border-radius: 1px; }
+.is-off .tol-bar { background: var(--off); opacity: .5; }
+.tol-mark { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--callout); z-index: 1; }
+@media (min-width: 860px) { .tol-mark { top: -.75rem; bottom: -.75rem; } }
+.tol-axis { position: relative; height: 1.1rem; font: 400 .6875rem/1 var(--mono); color: var(--muted); }
+.tol-axis span { position: absolute; top: .2rem; transform: translateX(-50%); white-space: nowrap; }
+.tol-axis span:first-child { transform: none; }
+.tol-axis span:last-child { transform: translateX(-100%); }
+.tol-note { margin-top: 1.25rem; color: var(--muted); font-size: .9375rem; max-width: 46rem; }
+
+/* Materials */
+.table-scroll { overflow-x: auto; border-top: 2px solid var(--ink); }
+.mat { width: 100%; min-width: 44rem; border-collapse: collapse; }
+.mat th, .mat td { text-align: left; padding: .8rem 1.25rem .8rem 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.mat thead th { font: 500 .75rem/1.3 var(--mono); color: var(--muted); }
+.mat tbody th { font-weight: 600; white-space: nowrap; }
+.mat td { color: var(--muted); }
+.mat .num { font: 400 .875rem/1.5 var(--mono); font-variant-numeric: tabular-nums; color: var(--ink); white-space: nowrap; }
+.stds { display: flex; flex-wrap: wrap; gap: .5rem 2rem; margin-top: 2.25rem; }
+.stds li { font-size: .9375rem; color: var(--muted); }
+.stds b { display: block; font: 500 .875rem/1.4 var(--mono); color: var(--ink); }
+
+/* Quote */
+.quote-grid { display: grid; gap: 2.5rem; }
+.quote-grid > * { min-width: 0; }
+@media (min-width: 960px) { .quote-grid { grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: 4rem; } }
+.quote-grid h2 { font: 700 clamp(2rem, 3.8vw, 3rem)/1.05 var(--display); font-stretch: 85%; text-wrap: balance; }
+.quote-grid .lead { margin-top: 1rem; color: var(--muted); }
+.checklist { margin-top: 1.5rem; display: grid; gap: .5rem; }
+.checklist li { padding-left: 1.4rem; position: relative; font-size: .9375rem; }
+.checklist li::before { content: ""; position: absolute; left: 0; top: .5em; width: .65rem; height: .65rem; border: 1.5px solid var(--accent); }
+form.rfq { display: grid; gap: 1.1rem 1.25rem; background: var(--surface); border: 1px solid var(--rule); padding: clamp(1rem, 2.5vw, 2rem); }
+@media (min-width: 600px) { form.rfq { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.field { display: grid; gap: .35rem; min-width: 0; }
+.field.full { grid-column: 1 / -1; }
+.field label { font-weight: 500; font-size: .9375rem; }
+.field input, .field select, .field textarea {
+  width: 100%; min-width: 0; padding: .65rem .7rem; font: 400 1rem/1.4 var(--body); color: var(--ink);
+  background: var(--bg); border: 1px solid var(--muted); border-radius: 2px;
+}
+.field textarea { min-height: 7.5rem; resize: vertical; }
+.form-foot { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1.25rem; }
+.btn-solid { background: var(--accent); color: var(--bg); }
+.btn-solid:hover { filter: brightness(1.12); }
+.btn-ghost { background: transparent; border-color: var(--muted); color: var(--ink); }
+.form-note { font-size: .875rem; color: var(--muted); flex: 1 1 15rem; }
+.result { grid-column: 1 / -1; display: grid; gap: .75rem; border-top: 1px solid var(--rule); padding-top: 1.1rem; }
+.result pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 400 .8125rem/1.55 var(--mono); background: var(--bg); padding: .85rem; border: 1px solid var(--rule); }
+.result p { font-size: .9375rem; }
+
+/* Title block footer */
+.footer { padding-block: 2.5rem; }
+.titleblock { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 2px solid var(--ink); }
+@media (min-width: 800px) { .titleblock { grid-template-columns: minmax(0, 3fr) repeat(4, minmax(0, 1fr)); } }
+.titleblock div { padding: .6rem .75rem; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); min-width: 0; }
+.titleblock .name { grid-column: 1 / -1; }
+@media (min-width: 800px) { .titleblock .name { grid-column: auto; grid-row: span 2; border-right: 1px solid var(--rule); } }
+.titleblock span { display: block; font: 400 .6875rem/1.3 var(--mono); color: var(--muted); }
+.titleblock b { font: 500 .875rem/1.4 var(--mono); overflow-wrap: anywhere; }
+.titleblock .name b { font: 700 1.375rem/1.2 var(--display); }
+.titleblock .name p { margin-top: .2rem; font-size: .9375rem; color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="plate">
+  <header class="wrap topbar">
+    <a class="brand" href="#main" aria-label="MDM home">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="15" fill="none" stroke="#fff" stroke-width="1.5"/><circle cx="17" cy="17" r="5.5" fill="none" stroke="#FFA366" stroke-width="1.5"/><path d="M17 0v34M0 17h34" stroke="#A6B3EC" stroke-width=".75" stroke-dasharray="6 2 1 2"/></svg>
+      <b>MDM</b>
+      <span>Mechanical Design<br>&amp; Manufacturing</span>
+    </a>
+    <nav class="topnav" aria-label="Main">
+      <a href="#services">Services</a>
+      <a href="#process">Process</a>
+      <a href="#tolerances">Tolerance guide</a>
+      <a href="#materials">Materials</a>
+      <a href="#quote">Request a quote</a>
+    </nav>
+  </header>
+
+  <main id="main" class="wrap hero">
+    <div>
+      <h1>From first sketch to measured part.</h1>
+      <p>MDM designs mechanical components and assemblies, proves them by analysis, and carries them through manufacture and inspection. The design intent stays intact from CAD to the finished part.</p>
+      <div class="actions">
+        <a class="btn btn-flag" href="#quote">Request a quote</a>
+        <a class="btn btn-line" href="#services">See what we do</a>
+      </div>
+    </div>
+
+    <figure class="sheet" aria-label="One flange shown through four engineering stages">
+      <div class="stages" role="tablist" aria-label="Project stage">
+        <button type="button" role="tab" id="tab-design" aria-controls="readout" aria-selected="true" data-stage="design">Design</button>
+        <button type="button" role="tab" id="tab-simulate" aria-controls="readout" aria-selected="false" tabindex="-1" data-stage="simulate">Analyse</button>
+        <button type="button" role="tab" id="tab-machine" aria-controls="readout" aria-selected="false" tabindex="-1" data-stage="machine">Machine</button>
+        <button type="button" role="tab" id="tab-inspect" aria-controls="readout" aria-selected="false" tabindex="-1" data-stage="inspect">Inspect</button>
+      </div>
+
+      <svg class="drawing" viewBox="0 0 640 430" role="img" aria-label="Engineering drawing of a flange with front view and section A-A">
+        <defs>
+          <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#A6B3EC" stroke-width=".8"/></pattern>
+          <marker id="arr" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="9" markerHeight="5.5" orient="auto-start-reverse"><path d="M0 0L10 3L0 6z" fill="#A6B3EC"/></marker>
+          <marker id="arr-hot" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="9" markerHeight="5.5" orient="auto-start-reverse"><path d="M0 0L10 3L0 6z" fill="#FFA366"/></marker>
+          <radialGradient id="stress" gradientUnits="userSpaceOnUse" cx="190" cy="225" r="96">
+            <stop offset=".33" stop-color="#F7C948"/><stop offset=".5" stop-color="#E5484D"/><stop offset=".62" stop-color="#F7C948"/><stop offset=".76" stop-color="#3FB68B"/><stop offset="1" stop-color="#2F6FE0"/>
+          </radialGradient>
+          <linearGradient id="stress-h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3FB68B"/><stop offset=".4" stop-color="#E5484D"/><stop offset=".62" stop-color="#F7C948"/><stop offset="1" stop-color="#2F6FE0"/></linearGradient>
+          <linearGradient id="legend" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#2F6FE0"/><stop offset=".35" stop-color="#3FB68B"/><stop offset=".7" stop-color="#F7C948"/><stop offset="1" stop-color="#E5484D"/></linearGradient>
+        </defs>
+
+        <rect x="6" y="6" width="628" height="418" fill="none" stroke="#39479B"/>
+
+        <!-- Under-layers for each stage -->
+        <g data-layer="simulate" class="overlay" hidden>
+          <circle cx="190" cy="225" r="96" fill="url(#stress)"/>
+          <path fill="url(#stress-h)" d="M420 193H492V177H448.8V161.8H420zM420 144.2H448.8V129H420zM420 257H492V273H448.8V288.2H420zM420 305.8H448.8V321H420z"/>
+        </g>
+
+        <!-- Section hatching -->
+        <g data-layer="hatch">
+          <path fill="url(#hatch)" d="M420 193H492V177H448.8V161.8H420zM420 144.2H448.8V129H420zM420 257H492V273H448.8V288.2H420zM420 305.8H448.8V321H420z"/>
+        </g>
+
+        <!-- Part geometry at 1.6 px per mm -->
+        <g>
+          <circle class="geo scribe" pathLength="1" cx="190" cy="225" r="96"/>
+          <circle class="geo scribe" pathLength="1" cx="190" cy="225" r="48" style="animation-delay:.1s"/>
+          <circle class="geo scribe" pathLength="1" cx="190" cy="225" r="32" fill="#111A55" style="fill:#111A55;animation-delay:.2s"/>
+          <circle class="center" cx="190" cy="225" r="72"/>
+          <g style="fill:#111A55">
+            <circle class="geo scribe" pathLength="1" style="fill:#111A55;animation-delay:.3s" cx="190" cy="153" r="8.8"/>
+            <circle class="geo scribe" pathLength="1" style="fill:#111A55;animation-delay:.35s" cx="252.35" cy="189" r="8.8"/>
+            <circle class="geo scribe" pathLength="1" style="fill:#111A55;animation-delay:.4s" cx="252.35" cy="261" r="8.8"/>
+            <circle class="geo scribe" pathLength="1" style="fill:#111A55;animation-delay:.45s" cx="190" cy="297" r="8.8"/>
+            <circle class="geo scribe" pathLength="1" style="fill:#111A55;animation-delay:.5s" cx="127.65" cy="261" r="8.8"/>
+            <circle class="geo scribe" pathLength="1" style="fill:#111A55;animation-delay:.55s" cx="127.65" cy="189" r="8.8"/>
+          </g>
+          <path class="center" d="M82 225H298"/>
+          <path class="center" d="M190 112V338"/>
+          <path class="geo" d="M186 112H194M186 338H194" style="stroke-width:2.5"/>
+          <path class="thin" marker-end="url(#arr)" d="M194 110H212"/>
+          <path class="thin" marker-end="url(#arr)" d="M194 340H212"/>
+          <text x="216" y="114" style="font-weight:500">A</text>
+          <text x="216" y="344" style="font-weight:500">A</text>
+
+          <path class="geo scribe" pathLength="1" d="M420 129H448.8V177H492V273H448.8V321H420Z" style="animation-delay:.25s"/>
+          <path class="geo" d="M420 193H492M420 257H492"/>
+          <path class="geo" d="M420 144.2H448.8M420 161.8H448.8M420 288.2H448.8M420 305.8H448.8"/>
+          <path class="center" d="M408 225H504"/>
+          <path class="center" d="M410 153H459M410 297H459"/>
+          <text x="438" y="350">SECTION A-A</text>
+        </g>
+
+        <!-- Design: dimensions and GD&T -->
+        <g data-layer="design" class="overlay">
+          <path class="thin" d="M94 232V384M286 232V384"/>
+          <path class="thin" marker-start="url(#arr)" marker-end="url(#arr)" d="M94 378H286"/>
+          <text x="174" y="373">Ø120</text>
+
+          <path class="thin" d="M240.9 174.1L282 102H340"/>
+          <text x="286" y="97">Ø90 PCD</text>
+
+          <path class="thin" marker-start="url(#arr)" d="M120 184.6L72 106H16"/>
+          <text x="18" y="100">6 × Ø11 THRU</text>
+          <g transform="translate(16 110)">
+            <rect class="hotline" width="102" height="19"/>
+            <path class="hotline" d="M22 0V19M78 0V19"/>
+            <circle class="hotline" cx="11" cy="9.5" r="5"/><path class="hotline" d="M11 2V17M4 9.5H18"/>
+            <text class="hot" x="27" y="13.5">Ø0.1</text>
+            <text class="hot" x="86" y="13.5">A</text>
+          </g>
+
+          <path class="thin" d="M420 124V54M448.8 124V84M492 172V54"/>
+          <path class="thin" marker-start="url(#arr)" marker-end="url(#arr)" d="M420 88H448.8"/>
+          <text x="427" y="82">18</text>
+          <path class="thin" marker-start="url(#arr)" marker-end="url(#arr)" d="M420 60H492"/>
+          <text x="449" y="54">45</text>
+
+          <path class="thin" d="M497 193H538M497 257H538"/>
+          <path class="hotline" marker-start="url(#arr-hot)" marker-end="url(#arr-hot)" d="M532 193V257"/>
+          <text class="hot" transform="translate(527 248) rotate(-90)">Ø40 H7</text>
+          <path class="thin" d="M497 177H584M497 273H584"/>
+          <path class="thin" marker-start="url(#arr)" marker-end="url(#arr)" d="M578 177V273"/>
+          <text transform="translate(573 238) rotate(-90)">Ø60</text>
+
+          <path class="hotline" d="M420 298H393"/>
+          <path d="M420 298L411 293V303Z" fill="#FFA366"/>
+          <rect class="hotline" x="373" y="288" width="20" height="20"/>
+          <text class="hot" x="379.5" y="302">A</text>
+
+          <g transform="translate(372 364)">
+            <path class="hotline" d="M52 -43V0" transform="translate(0 0)"/>
+            <rect class="hotline" width="82" height="19" y="0"/>
+            <path class="hotline" d="M22 0V19"/>
+            <path class="hotline" d="M5 13L8 6H18L15 13Z"/>
+            <text class="hot" x="30" y="13.5">0.02</text>
+          </g>
+          <text class="small" x="504" y="378">Ra 1.6 at bore</text>
+          <text class="small" x="504" y="393">ISO 2768-mK</text>
+          <text class="small" x="18" y="412">6061-T6. Dimensions in mm.</text>
+        </g>
+
+        <!-- Analyse: legend and peak -->
+        <g data-layer="simulate" class="overlay" hidden>
+          <rect x="566" y="129" width="14" height="192" fill="url(#legend)" stroke="#A6B3EC" stroke-width=".5"/>
+          <text x="586" y="133">180</text>
+          <text x="586" y="197">120</text>
+          <text x="586" y="261">60</text>
+          <text x="586" y="325">0 MPa</text>
+          <path class="hotline" marker-end="url(#arr-hot)" d="M528 118L451 173"/>
+          <text class="hot" x="500" y="110">Peak at hub root</text>
+          <text class="small" x="18" y="412">Illustrative plot. von Mises stress.</text>
+        </g>
+
+        <!-- Machine: toolpath -->
+        <g data-layer="machine" class="overlay" hidden>
+          <g class="hotline" style="stroke-dasharray:4 3">
+            <circle cx="190" cy="225" r="88"/><circle cx="190" cy="225" r="77"/><circle cx="190" cy="225" r="66"/><circle cx="190" cy="225" r="55"/><circle cx="190" cy="225" r="42"/>
+          </g>
+          <path class="hotline" d="M190 145V161M182 153H198M252.35 181V197M244.35 189H260.35M252.35 253V269M244.35 261H260.35M190 289V305M182 297H198M127.65 253V269M119.65 261H135.65M127.65 181V197M119.65 189H135.65"/>
+          <circle id="tool" r="9" fill="#FFA366" fill-opacity=".35" stroke="#FFA366" cx="0" cy="0">
+            <animateMotion dur="9s" repeatCount="indefinite" path="M278 225A88 88 0 1 1 102 225A88 88 0 1 1 278 225"/>
+          </circle>
+          <rect x="416" y="125" width="80" height="200" fill="none" stroke="#FFA366" stroke-dasharray="5 3"/>
+          <text class="hot" x="416" y="116">Stock Ø125 × 50</text>
+          <text class="small" x="18" y="376">N20 G00 X-44. Y0. Z2.</text>
+          <text class="small" x="18" y="392">N30 G02 X-44. Y0. I44. J0. F600</text>
+          <text class="small" x="18" y="408">N40 G81 X0. Y36. Z-20. R2. F180</text>
+          <text class="small" x="438" y="370">Sample toolpath</text>
+        </g>
+
+        <!-- Inspect: probe points -->
+        <g data-layer="inspect" class="overlay" hidden>
+          <g fill="#FFA366">
+            <circle cx="222" cy="225" r="2.6"/><circle cx="212.6" cy="247.6" r="2.6"/><circle cx="190" cy="257" r="2.6"/><circle cx="167.4" cy="247.6" r="2.6"/>
+            <circle cx="158" cy="225" r="2.6"/><circle cx="167.4" cy="202.4" r="2.6"/><circle cx="190" cy="193" r="2.6"/><circle cx="212.6" cy="202.4" r="2.6"/>
+            <circle cx="190" cy="153" r="2.6"/><circle cx="252.35" cy="189" r="2.6"/><circle cx="252.35" cy="261" r="2.6"/><circle cx="190" cy="297" r="2.6"/><circle cx="127.65" cy="261" r="2.6"/><circle cx="127.65" cy="189" r="2.6"/>
+            <circle cx="420" cy="136" r="2.6"/><circle cx="420" cy="175" r="2.6"/><circle cx="420" cy="275" r="2.6"/><circle cx="420" cy="314" r="2.6"/>
+          </g>
+          <path class="hotline" d="M222 225L300 142H345"/>
+          <text class="hot" x="304" y="136">Bore, 8 points</text>
+          <path class="hotline" d="M420 175H378"/>
+          <text class="hot" x="330" y="171">Datum A</text>
+          <text class="small" x="18" y="412">Probe points shown for illustration.</text>
+        </g>
+      </svg>
+
+      <div class="readout" id="readout" role="tabpanel" aria-live="polite" aria-labelledby="tab-design">
+        <div data-panel="design">
+          <h2>Tolerance what matters</h2>
+          <p>Datums follow how the flange locates in service. Only the bore, face and bolt pattern carry tight callouts, which keeps the part affordable.</p>
+        </div>
+        <dl data-panel="design">
+          <div><dt>Bore fit</dt><dd>Ø40 H7 (+0.025 / 0)</dd></div>
+          <div><dt>Bolt pattern</dt><dd>Position Ø0.1 to A</dd></div>
+          <div><dt>Datum face</dt><dd>Flatness 0.02</dd></div>
+          <div><dt>General tolerances</dt><dd>ISO 2768-mK</dd></div>
+        </dl>
+        <div data-panel="simulate" hidden>
+          <h2>Find the weak point early</h2>
+          <p>Analysis shows where load concentrates, so a fillet or wall change happens in CAD, well before anyone cuts metal.</p>
+        </div>
+        <div data-panel="simulate" hidden>
+          <dl>
+            <div><dt>Peak stress</dt><dd>168 MPa</dd></div>
+            <div><dt>6061-T6 yield</dt><dd>276 MPa</dd></div>
+            <div><dt>Safety factor</dt><dd>1.64</dd></div>
+          </dl>
+          <p class="sample">Illustrative figures, not a real load case.</p>
+        </div>
+        <div data-panel="machine" hidden>
+          <h2>Plan the setups around the datums</h2>
+          <p>Stock, workholding and operation order are chosen so that critical features are cut in one setup, against the surfaces the drawing measures from.</p>
+        </div>
+        <dl data-panel="machine" hidden>
+          <div><dt>Op 10</dt><dd>Turn datum face A, rough OD</dd></div>
+          <div><dt>Op 20</dt><dd>Flip, turn hub, face to length</dd></div>
+          <div><dt>Op 30</dt><dd>Bore Ø40 H7, finish pass</dd></div>
+          <div><dt>Op 40</dt><dd>Drill 6 × Ø11 on Ø90 PCD</dd></div>
+        </dl>
+        <div data-panel="inspect" hidden>
+          <h2>Measure against the drawing</h2>
+          <p>Each critical callout is checked and recorded, so the report traces straight back to the drawing that defined it.</p>
+        </div>
+        <div data-panel="inspect" hidden>
+          <table>
+            <thead><tr><th scope="col">Feature</th><th scope="col">Limit</th><th scope="col">Measured</th><th scope="col">Result</th></tr></thead>
+            <tbody>
+              <tr><td>Ø40 H7</td><td>+0.025/0</td><td>+0.012</td><td class="pass">Pass</td></tr>
+              <tr><td>Position</td><td>Ø0.100</td><td>Ø0.041</td><td class="pass">Pass</td></tr>
+              <tr><td>Flatness</td><td>0.020</td><td>0.009</td><td class="pass">Pass</td></tr>
+            </tbody>
+          </table>
+          <p class="sample">Sample data for illustration.</p>
+        </div>
+      </div>
+    </figure>
+  </main>
+</div>
+
+<section class="band" id="services">
+  <div class="wrap">
+    <div class="sect-head">
+      <h2>Engineering services, joined up</h2>
+      <p>Bring us a sketch, a worn-out part or a released drawing. Each service stands on its own, and they share one set of data when you need the full route.</p>
+    </div>
+    <ul class="svc">
+      <li>
+        <h3>Mechanical design</h3>
+        <p>Parts, assemblies and machines taken from requirements through concept, detailed 3D CAD and release, with manufacture and assembly considered from the start.</p>
+        <div class="gets"><b>You receive</b>Native CAD and STEP files, 2D drawings with GD&amp;T, bill of materials</div>
+      </li>
+      <li>
+        <h3>Engineering analysis</h3>
+        <p>Structural and thermal FEA, fatigue checks and tolerance stack-ups that answer a specific question: will it hold, will it fit, and where can weight or cost come out?</p>
+        <div class="gets"><b>You receive</b>Calculation report with load cases, assumptions and recommended changes</div>
+      </li>
+      <li>
+        <h3>Reverse engineering</h3>
+        <p>Rebuild legacy or undocumented parts from physical samples, using measurement and 3D scanning, then correct the wear out of the model so the replacement fits as designed.</p>
+        <div class="gets"><b>You receive</b>Clean parametric model and a drawing ready for manufacture</div>
+      </li>
+      <li>
+        <h3>Prototyping</h3>
+        <p>Test form, fit and function quickly with 3D printing, machined one-offs or soft tooling, and feed what you learn back into the design before committing to production.</p>
+        <div class="gets"><b>You receive</b>Physical prototypes and a list of design revisions</div>
+      </li>
+      <li>
+        <h3>Manufacturing</h3>
+        <p>CNC machining, sheet metal, welded fabrication and casting, from single parts to production batches, with the process chosen to suit quantity, material and tolerance.</p>
+        <div class="gets"><b>You receive</b>Finished parts or assemblies, with process routing on request</div>
+      </li>
+      <li>
+        <h3>Inspection and documentation</h3>
+        <p>Dimensional inspection against the released drawing, first-article reports and material records, so every critical feature has evidence behind it.</p>
+        <div class="gets"><b>You receive</b>Inspection report and material certificates where supplied</div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="band" id="process">
+  <div class="wrap">
+    <div class="sect-head">
+      <h2>Six stages, each with a clear gate</h2>
+      <p>You see the work and approve it at each gate. If a requirement changes, the change is revised in the data and carried through to every downstream document.</p>
+    </div>
+    <ol class="steps">
+      <li><h3>Brief</h3><p>We capture function, loads, environment, quantity, budget and target date.</p><span class="gate">Gate: agreed requirements</span></li>
+      <li><h3>Concept</h3><p>Layouts and options are compared on function, cost and manufacturability.</p><span class="gate">Gate: chosen concept</span></li>
+      <li><h3>Detail design</h3><p>Full CAD, analysis, DFM review and tolerance stack-up.</p><span class="gate">Gate: design review</span></li>
+      <li><h3>Release</h3><p>Drawings, bill of materials and revision control are issued.</p><span class="gate">Gate: Rev A signed off</span></li>
+      <li><h3>Prototype</h3><p>A first article tests fit and function, and the results update the design.</p><span class="gate">Gate: first article accepted</span></li>
+      <li><h3>Production</h3><p>Parts are made, inspected against the drawing, documented and delivered.</p><span class="gate">Gate: inspection report</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="band" id="tolerances">
+  <div class="wrap">
+    <div class="sect-head">
+      <h2>What tolerance do you really need?</h2>
+      <p>Tighter is not automatically better. Each step down the scale can add an operation, a slower cut or more inspection. Move the slider to see which processes can hold your number.</p>
+    </div>
+    <div class="tol-panel">
+      <div class="tol-control">
+        <label for="tol-range">Required tolerance</label>
+        <input type="range" id="tol-range" min="0" max="7" step="1" value="3" aria-describedby="tol-note">
+        <output id="tol-out" for="tol-range">±0.05 mm</output>
+      </div>
+      <div class="tol-axis-row">
+        <div class="tol-axis" aria-hidden="true" id="tol-axis"></div>
+      </div>
+      <div id="tol-rows"></div>
+      <p class="tol-note" id="tol-note">Bars run from the tightest practical tolerance to normal shop practice, on a logarithmic scale in ± mm. This is a general guide for features up to about 100 mm. Size, material and setup all shift these ranges, so we confirm tolerances for each job.</p>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="materials">
+  <div class="wrap">
+    <div class="sect-head">
+      <h2>Materials we commonly specify</h2>
+      <p>Material choice affects strength, weight, corrosion life and machining cost. These are common starting points, and we can work to your specification.</p>
+    </div>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Materials table">
+      <table class="mat">
+        <thead><tr><th scope="col">Material</th><th scope="col">Density, g/cm³</th><th scope="col">Good for</th><th scope="col">Usual routes</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Aluminium 6061-T6</th><td class="num">2.70</td><td>General structural parts, good corrosion resistance</td><td>Milling, turning, welding</td></tr>
+          <tr><th scope="row">Aluminium 7075-T6</th><td class="num">2.81</td><td>High strength at low weight</td><td>Milling, turning</td></tr>
+          <tr><th scope="row">Alloy steel 4140</th><td class="num">7.85</td><td>Shafts, gears, heat-treated parts</td><td>Turning, grinding</td></tr>
+          <tr><th scope="row">Stainless 316L</th><td class="num">8.00</td><td>Corrosive, marine and hygienic service</td><td>Machining, sheet, welding</td></tr>
+          <tr><th scope="row">Ductile iron</th><td class="num">7.10</td><td>Housings and heavy sections, good damping</td><td>Sand casting, machining</td></tr>
+          <tr><th scope="row">Bearing bronze</th><td class="num">8.90</td><td>Bushes and wear surfaces</td><td>Casting, turning</td></tr>
+          <tr><th scope="row">Titanium Ti-6Al-4V</th><td class="num">4.43</td><td>High strength-to-weight, corrosion resistance</td><td>Milling, turning</td></tr>
+          <tr><th scope="row">Acetal (POM)</th><td class="num">1.41</td><td>Low-friction, dimensionally stable plastic parts</td><td>Machining, moulding</td></tr>
+          <tr><th scope="row">PEEK</th><td class="num">1.31</td><td>High-temperature and chemically resistant plastic parts</td><td>Machining, moulding</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="stds" aria-label="Drawing and tolerance standards">
+      <li><b>ISO 1101</b>Geometric tolerancing</li>
+      <li><b>ASME Y14.5</b>Dimensioning and tolerancing</li>
+      <li><b>ISO 286</b>Limits and fits</li>
+      <li><b>ISO 2768</b>General tolerances</li>
+      <li><b>ISO 8062</b>Casting tolerances</li>
+    </ul>
+  </div>
+</section>
+
+<section class="band" id="quote">
+  <div class="wrap quote-grid">
+    <div>
+      <h2>Tell us what you need to make</h2>
+      <p class="lead">A rough sketch and a clear problem are enough to start. More detail gives you a more accurate quote.</p>
+      <ul class="checklist">
+        <li>What the part does and what it connects to</li>
+        <li>Quantity, now and over the product's life</li>
+        <li>Material, finish and operating environment</li>
+        <li>CAD files or drawings, if you have them</li>
+        <li>The date you need parts in hand</li>
+      </ul>
+    </div>
+    <form class="rfq" id="rfq" novalidate>
+      <div class="field"><label for="f-name">Your name</label><input id="f-name" name="name" autocomplete="name" required></div>
+      <div class="field"><label for="f-email">Email</label><input id="f-email" name="email" type="email" autocomplete="email" required></div>
+      <div class="field"><label for="f-company">Company (optional)</label><input id="f-company" name="company" autocomplete="organization"></div>
+      <div class="field">
+        <label for="f-service">Service</label>
+        <select id="f-service" name="service">
+          <option>Design and manufacture</option>
+          <option>Mechanical design only</option>
+          <option>Engineering analysis</option>
+          <option>Reverse engineering</option>
+          <option>Prototyping</option>
+          <option>Manufacture from my drawings</option>
+          <option>Inspection</option>
+        </select>
+      </div>
+      <div class="field"><label for="f-qty">Quantity</label><input id="f-qty" name="quantity" inputmode="numeric" placeholder="e.g. 50"></div>
+      <div class="field"><label for="f-material">Material (if known)</label><input id="f-material" name="material" placeholder="e.g. 6061-T6"></div>
+      <div class="field full"><label for="f-msg">Project description</label><textarea id="f-msg" name="message" required placeholder="What does it do, and what problem are you solving?"></textarea></div>
+      <div class="form-foot">
+        <button class="btn btn-solid" type="submit" id="rfq-submit">Prepare my request</button>
+        <p class="form-note" id="rfq-note" role="alert"></p>
+      </div>
+      <div class="result" id="rfq-result" hidden>
+        <p id="rfq-result-text"></p>
+        <pre id="rfq-summary"></pre>
+        <div><button class="btn btn-ghost" type="button" id="rfq-copy">Copy request</button></div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<footer class="wrap footer">
+  <div class="titleblock">
+    <div class="name"><b>MDM</b><p>Mechanical Design &amp; Manufacturing</p><p>m-d-m.duckdns.org</p></div>
+    <div><span>Scale</span><b>1:1</b></div>
+    <div><span>Units</span><b>mm, MPa</b></div>
+    <div><span>Sheet</span><b>1 of 1</b></div>
+    <div><span>Rev</span><b>A</b></div>
+    <div><span>Projection</span><b>First angle</b></div>
+    <div><span>Issued</span><b>2026-11</b></div>
+    <div><span>Copyright</span><b>© <span id="year" style="display:inline;font:inherit;color:inherit">2026</span> MDM</b></div>
+    <div><span>Status</span><b>Released</b></div>
+  </div>
+</footer>
+
+<script>
+/* Set this to the address that should receive quote requests. */
+const CONTACT_EMAIL = "";
+
+/* Stage switcher */
+(function () {
+  const tabs = [...document.querySelectorAll('.stages [role="tab"]')];
+  const panel = document.getElementById('readout');
+  function show(tab, focus) {
+    const stage = tab.dataset.stage;
+    tabs.forEach(t => {
+      const on = t === tab;
+      t.setAttribute('aria-selected', on);
+      t.tabIndex = on ? 0 : -1;
+    });
+    document.querySelectorAll('[data-layer]').forEach(el => {
+      if (el.dataset.layer === 'hatch') { el.hidden = stage === 'simulate'; el.style.display = stage === 'simulate' ? 'none' : ''; return; }
+      const on = el.dataset.layer === stage;
+      el.hidden = !on;
+      el.style.display = on ? '' : 'none';
+    });
+    document.querySelectorAll('[data-panel]').forEach(el => { el.hidden = el.dataset.panel !== stage; });
+    panel.setAttribute('aria-labelledby', tab.id);
+    if (focus) tab.focus();
+  }
+  tabs.forEach((t, i) => {
+    t.addEventListener('click', () => show(t));
+    t.addEventListener('keydown', e => {
+      const step = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+      if (!step) return;
+      e.preventDefault();
+      show(tabs[(i + step + tabs.length) % tabs.length], true);
+    });
+  });
+  show(tabs[0]);
+
+  const reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const motion = document.querySelector('#tool animateMotion');
+  if (reduced && motion) {
+    const tool = document.getElementById('tool');
+    motion.remove();
+    tool.setAttribute('cx', '278');
+    tool.setAttribute('cy', '225');
+  }
+})();
+
+/* Tolerance guide: [process, tightest practical, normal practice, surface finish, usual batch] */
+(function () {
+  const PROCESSES = [
+    ['Grinding', 0.002, 0.02, 'Ra 0.1–0.8', '1–10,000'],
+    ['Wire EDM', 0.003, 0.02, 'Ra 0.4–3.2', '1–500'],
+    ['CNC turning', 0.01, 0.1, 'Ra 0.8–3.2', '1–10,000'],
+    ['CNC milling', 0.01, 0.1, 'Ra 0.8–3.2', '1–5,000'],
+    ['Injection moulding', 0.05, 0.3, 'Set by tool', '1,000+'],
+    ['Laser cutting', 0.1, 0.25, 'Ra 3.2–12.5', '1–10,000'],
+    ['Investment casting', 0.1, 0.5, 'Ra 1.6–6.3', '50–10,000'],
+    ['Polymer 3D printing', 0.15, 0.5, 'Ra 6.3–25', '1–500'],
+    ['Sheet metal bending', 0.2, 0.75, 'As sheet', '1–10,000'],
+    ['Sand casting', 0.5, 3, 'Ra 6.3–25', '1–5,000'],
+  ];
+  const STOPS = [0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1];
+  const pos = v => (Math.log10(v) + 3) / 4 * 100;
+
+  document.getElementById('tol-axis').innerHTML = [0.001, 0.01, 0.1, 1, 10]
+    .map(v => `<span style="left:${pos(v)}%">±${v}</span>`).join('');
+
+  const host = document.getElementById('tol-rows');
+  host.innerHTML = PROCESSES.map(([name, best, std, ra, batch]) => `
+    <div class="tol-row" data-best="${best}" data-std="${std}">
+      <div class="tol-name">${name}</div>
+      <div class="tol-meta">±${best}–${std} · ${ra} · Qty ${batch}</div>
+      <div class="tol-track">
+        <div class="tol-bar" style="left:${pos(best)}%;width:${pos(std) - pos(best)}%"></div>
+        <div class="tol-mark"></div>
+      </div>
+      <div class="tol-state"><i></i><span></span></div>
+    </div>`).join('');
+
+  const range = document.getElementById('tol-range');
+  const out = document.getElementById('tol-out');
+  function update() {
+    const t = STOPS[+range.value];
+    const label = `±${t} mm`;
+    out.textContent = label;
+    range.setAttribute('aria-valuetext', label);
+    host.querySelectorAll('.tol-row').forEach(row => {
+      const best = +row.dataset.best, std = +row.dataset.std;
+      const kind = t >= std ? 'std' : t >= best ? 'tight' : 'off';
+      row.classList.toggle('is-off', kind === 'off');
+      row.querySelector('.tol-mark').style.left = pos(t) + '%';
+      const state = row.querySelector('.tol-state');
+      state.className = 'tol-state st-' + kind;
+      state.querySelector('span').textContent = { std: 'Normal practice', tight: 'Possible, costs more', off: 'Out of range' }[kind];
+    });
+  }
+  range.addEventListener('input', update);
+  update();
+})();
+
+/* Quote form: prepares an email, because a static site has no server to send it. */
+(function () {
+  const form = document.getElementById('rfq');
+  const note = document.getElementById('rfq-note');
+  const result = document.getElementById('rfq-result');
+  const summary = document.getElementById('rfq-summary');
+  const resultText = document.getElementById('rfq-result-text');
+  const copyBtn = document.getElementById('rfq-copy');
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const bad = [...form.querySelectorAll('[required]')].find(f => !f.checkValidity());
+    form.querySelectorAll('[required]').forEach(f => f.setAttribute('aria-invalid', !f.checkValidity()));
+    if (bad) {
+      const name = form.querySelector(`label[for="${bad.id}"]`).textContent;
+      note.textContent = bad.type === 'email' && bad.value
+        ? 'Enter a complete email address, such as name@company.com.'
+        : `Add ${name.toLowerCase()} to continue.`;
+      bad.focus();
+      return;
+    }
+    note.textContent = '';
+    const d = new FormData(form);
+    const subject = `Quote request: ${d.get('service')}`;
+    const text = [
+      `Name: ${d.get('name')}`,
+      `Email: ${d.get('email')}`,
+      d.get('company') && `Company: ${d.get('company')}`,
+      `Service: ${d.get('service')}`,
+      d.get('quantity') && `Quantity: ${d.get('quantity')}`,
+      d.get('material') && `Material: ${d.get('material')}`,
+    ].filter(Boolean).join('\n') + '\n\n' + d.get('message');
+    summary.textContent = text;
+    result.hidden = false;
+    if (CONTACT_EMAIL) {
+      resultText.textContent = `Your email app should open with this request. If it doesn't, copy the text and send it to ${CONTACT_EMAIL}. Attach any CAD files or drawings to that email.`;
+      location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
+    } else {
+      resultText.textContent = 'Your request is ready to copy, but this site has no contact address yet, so it has not been sent.';
+    }
+    result.scrollIntoView({ block: 'nearest' });
+  });
+
+  copyBtn.addEventListener('click', () => {
+    const selectIt = () => {
+      const r = document.createRange();
+      r.selectNodeContents(summary);
+      const s = getSelection();
+      s.removeAllRanges();
+      s.addRange(r);
+      copyBtn.textContent = 'Text selected, press Ctrl+C';
+    };
+    if (!navigator.clipboard) return selectIt();
+    navigator.clipboard.writeText(summary.textContent)
+      .then(() => { copyBtn.textContent = 'Copied'; })
+      .catch(selectIt);
+  });
+})();
+
+document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>

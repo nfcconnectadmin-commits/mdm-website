@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://m-d-m.duckdns.org/sitemap.xml
