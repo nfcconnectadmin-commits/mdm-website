@@ -1,14 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://web-claude.duckdns.org/</loc><lastmod>2026-11-06</lastmod></url>
-  <url><loc>https://web-claude.duckdns.org/apps/</loc><lastmod>2026-11-06</lastmod></url>
-  <url><loc>https://web-claude.duckdns.org/apps/machining-simulator.html</loc><lastmod>2026-11-06</lastmod></url>
-  <url><loc>https://web-claude.duckdns.org/apps/part-viewer.html</loc><lastmod>2026-11-06</lastmod></url>
-  <url><loc>https://web-claude.duckdns.org/apps/cutting-data.html</loc><lastmod>2026-11-06</lastmod></url>
+  <url><loc>https://web-claude.duckdns.org/</loc><lastmod>2026-11-07</lastmod></url>
+  <url><loc>https://web-claude.duckdns.org/ar/</loc><lastmod>2026-11-07</lastmod></url>
+  <url><loc>https://web-claude.duckdns.org/services.html</loc><lastmod>2026-11-07</lastmod></url>
+  <url><loc>https://web-claude.duckdns.org/apps/</loc><lastmod>2026-11-07</lastmod></url>
+  <url><loc>https://web-claude.duckdns.org/apps/check-my-part.html</loc><lastmod>2026-11-07</lastmod></url>
+  <url><loc>https://web-claude.duckdns.org/apps/machining-simulator.html</loc><lastmod>2026-11-07</lastmod></url>
+  <url><loc>https://web-claude.duckdns.org/apps/part-viewer.html</loc><lastmod>2026-11-07</lastmod></url>
   <url><loc>https://web-claude.duckdns.org/apps/parts-library.html</loc><lastmod>2026-11-07</lastmod></url>
   <url><loc>https://web-claude.duckdns.org/apps/fits-calculator.html</loc><lastmod>2026-11-07</lastmod></url>
+  <url><loc>https://web-claude.duckdns.org/apps/cutting-data.html</loc><lastmod>2026-11-07</lastmod></url>
   <url><loc>https://web-claude.duckdns.org/apps/bolt-circle.html</loc><lastmod>2026-11-07</lastmod></url>
   <url><loc>https://web-claude.duckdns.org/apps/thread-chart.html</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://web-claude.duckdns.org/ar/</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://web-claude.duckdns.org/apps/check-my-part.html</loc><lastmod>2026-11-07</lastmod></url>
+  <url><loc>https://web-claude.duckdns.org/apps/tolerance-guide.html</loc><lastmod>2026-11-07</lastmod></url>
+  <url><loc>https://web-claude.duckdns.org/industries/steel-fabrication.html</loc><lastmod>2026-11-07</lastmod></url>
+  <url><loc>https://web-claude.duckdns.org/industries/pumps.html</loc><lastmod>2026-11-07</lastmod></url>
+  <url><loc>https://web-claude.duckdns.org/industries/oil-gas-piping.html</loc><lastmod>2026-11-07</lastmod></url>
+  <url><loc>https://web-claude.duckdns.org/industries/industrial-machinery.html</loc><lastmod>2026-11-07</lastmod></url>
+  <url><loc>https://web-claude.duckdns.org/industries/automotive.html</loc><lastmod>2026-11-07</lastmod></url>
+  <url><loc>https://web-claude.duckdns.org/insights/</loc><lastmod>2026-11-07</lastmod></url>
+  <url><loc>https://web-claude.duckdns.org/insights/choosing-tolerances.html</loc><lastmod>2026-11-07</lastmod></url>
+  <url><loc>https://web-claude.duckdns.org/insights/preparing-stl-for-quote.html</loc><lastmod>2026-11-07</lastmod></url>
+  <url><loc>https://web-claude.duckdns.org/insights/understanding-fits.html</loc><lastmod>2026-11-07</lastmod></url>
 </urlset>
