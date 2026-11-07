@@ -1,4 +1,4 @@
-/* MDM 3D viewer: a Z-up orbit view and parametric part models, all in millimetres. */
+/* ME 3D viewer: a Z-up orbit view and parametric part models, all in millimetres. */
 (function () {
   'use strict';
   const TAU = Math.PI * 2;
@@ -615,7 +615,7 @@
     const tris = geometries.reduce((n, g) => n + (g.index ? g.index.count : g.attributes.position.count) / 3, 0);
     const buf = new ArrayBuffer(84 + tris * 50);
     const view = new DataView(buf);
-    const title = 'MDM part, millimetres';
+    const title = 'ME part, millimetres';
     for (let i = 0; i < title.length; i++) view.setUint8(i, title.charCodeAt(i));
     view.setUint32(80, tris, true);
     let at = 84;

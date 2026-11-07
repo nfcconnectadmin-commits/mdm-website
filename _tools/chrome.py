@@ -11,11 +11,9 @@ FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com">\n'
          '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
          '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700'
          '&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">')
-ICON = ("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230E2A5C'/%3E"
-        "%3Ccircle cx='16' cy='16' r='9.5' fill='none' stroke='%23fff' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='3.5' fill='%234FB3F0'/%3E%3C/svg%3E")
-MARK = ('<svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="10" fill="#0E2A5C"/>'
-        '<circle cx="20" cy="20" r="11.5" fill="none" stroke="#fff" stroke-width="2.2"/><circle cx="20" cy="20" r="4.2" fill="#4FB3F0"/>'
-        '<path d="M20 4v8M20 28v8M4 20h8M28 20h8" stroke="#4FB3F0" stroke-width="2.2" stroke-linecap="round"/></svg>')
+ICON = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='98 98 884 884'%3E%3Crect x='98' y='98' width='884' height='884' rx='170' fill='%233779F8'/%3E%3Cg fill='%23fff'%3E%3Cpath d='M108 340H184L332 524L480 340H556L332 628L176 436V740H108Z'/%3E%3Cpath d='M488 500L556 416V740H488Z'/%3E%3Cpath d='M652 340H972V408H652Z'/%3E%3Cpath d='M652 506H908V574H652Z'/%3E%3Cpath d='M652 672H972V740H652Z'/%3E%3C/g%3E%3C/svg%3E"
+MARK = ('<svg class="logo-mark" viewBox="108 340 864 400" width="78" height="36" fill="currentColor" aria-hidden="true">'
+        '<path d="M108 340H184L332 524L480 340H556L332 628L176 436V740H108Z"/><path d="M488 500L556 416V740H488Z"/><path d="M652 340H972V408H652Z"/><path d="M652 506H908V574H652Z"/><path d="M652 672H972V740H652Z"/></svg>')
 SEARCH_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>'
 MENU_ICON = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>'
 
@@ -51,7 +49,7 @@ APPS = [
 ]
 
 T = {
-    'en': dict(skip='Skip to content', home='MDM home', tag='Mechanical Design &amp; Manufacturing', main='Main',
+    'en': dict(skip='Skip to content', home='ME home', tag='Mechanical Design &amp; Manufacturing', main='Main',
                industries='Industries', services='Services', apps='Apps', insights='Insights', contact='Contact', quote='Request a quote',
                ind_intro='Engineering and parts for five sectors, from one design and manufacturing team.',
                svc_intro='Six services that work alone or together, from first sketch to measured part.',
@@ -59,8 +57,8 @@ T = {
                all_ind='All industries', all_svc='All services', all_apps='All apps',
                search='Search the site', search_ph='Search pages, apps and services', close='Close search', menu='Open menu',
                lang_label='العربية', lang_attr='ar', foot_text='Mechanical design, analysis, manufacturing and inspection, from first sketch to measured part.',
-               company='Company', email_label='Email', rights='MDM Mechanical Design &amp; Manufacturing', foot_line='Engineered from first sketch to measured part.'),
-    'ar': dict(skip='انتقل إلى المحتوى', home='الصفحة الرئيسية لـ MDM', tag='للتصميم والتصنيع الميكانيكي', main='القائمة الرئيسية',
+               company='Company', email_label='Email', rights='ME Mechanical Design &amp; Manufacturing', foot_line='Engineered from first sketch to measured part.'),
+    'ar': dict(skip='انتقل إلى المحتوى', home='الصفحة الرئيسية لـ ME', tag='للتصميم والتصنيع الميكانيكي', main='القائمة الرئيسية',
                industries='القطاعات', services='الخدمات', apps='التطبيقات', insights='مقالات', contact='تواصل معنا', quote='اطلب عرض سعر',
                ind_intro='هندسة وقطع لخمسة قطاعات، من فريق واحد للتصميم والتصنيع.',
                svc_intro='ست خدمات تعمل منفردة أو مجتمعة، من الرسم الأولي حتى القطعة المقاسة.',
@@ -68,7 +66,7 @@ T = {
                all_ind='كل القطاعات', all_svc='كل الخدمات', all_apps='كل التطبيقات',
                search='البحث في الموقع', search_ph='ابحث في الصفحات والتطبيقات والخدمات', close='إغلاق البحث', menu='فتح القائمة',
                lang_label='English', lang_attr='en', foot_text='التصميم الميكانيكي والتحليل والتصنيع والفحص، من الرسم الأولي حتى القطعة المقاسة.',
-               company='الشركة', email_label='البريد', rights='MDM للتصميم والتصنيع الميكانيكي', foot_line='هندسة من الرسم الأولي حتى القطعة المقاسة.'),
+               company='الشركة', email_label='البريد', rights='ME للتصميم والتصنيع الميكانيكي', foot_line='هندسة من الرسم الأولي حتى القطعة المقاسة.'),
 }
 
 
@@ -101,7 +99,7 @@ def header(lang, P, other=None):
 <a class="skip" href="#main">{t['skip']}</a>
 <header class="site-header" id="site-header">
   <div class="wrap header-bar">
-    <a class="logo" href="{home}" aria-label="{t['home']}">{MARK}<span><b>MDM</b><small>{t['tag']}</small></span></a>
+    <a class="logo" href="{home}" aria-label="{t['home']}">{MARK}<small>{t['tag']}</small></a>
     <nav class="main-nav" id="main-nav" aria-label="{t['main']}">
       <ul class="nav-list">
         {mega('industries', t['industries'], t['ind_intro'], t['all_ind'], home + '#industries', links(INDUSTRIES, P, lang, 'industries/'))}
@@ -148,7 +146,7 @@ def footer(lang, P):
 <footer class="site-footer">
   <div class="wrap footer-grid">
     <div class="footer-brand">
-      <a class="logo" href="{home}">{MARK}<span><b>MDM</b><small>{t['tag']}</small></span></a>
+      <a class="logo" href="{home}" aria-label="{t['home']}">{MARK}<small>{t['tag']}</small></a>
       <p>{t['foot_text']}</p>
       <p>{t['email_label']}: <a href="mailto:mahmoudsobhyelagha@gmail.com">mahmoudsobhyelagha@gmail.com</a></p>
     </div>

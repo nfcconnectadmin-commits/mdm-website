@@ -1,4 +1,4 @@
-/* MDM 3D machining simulation. Runs G-code against a height map of the stock. */
+/* ME 3D machining simulation. Runs G-code against a height map of the stock. */
 (function () {
   'use strict';
   const $ = id => document.getElementById(id);
@@ -125,7 +125,7 @@
     plate: {
       name: 'Pocket plate',
       gcode() {
-        const p = program(['(MDM SAMPLE: POCKET PLATE)', '(STOCK 120 X 80 X 31. Z0 = FINISHED TOP)', 'G21 G90 G17']);
+        const p = program(['(ME SAMPLE: POCKET PLATE)', '(STOCK 120 X 80 X 31. Z0 = FINISHED TOP)', 'G21 G90 G17']);
         p.tool(1, 3000, 'OP10 FACE TOP');
         p.faceTop(12);
         p.tool(2, 6000, 'OP20 RECTANGULAR POCKET');
@@ -142,7 +142,7 @@
     boss: {
       name: 'Round boss',
       gcode() {
-        const p = program(['(MDM SAMPLE: ROUND BOSS)', '(STOCK 120 X 80 X 31. Z0 = FINISHED TOP)', 'G21 G90 G17']);
+        const p = program(['(ME SAMPLE: ROUND BOSS)', '(STOCK 120 X 80 X 31. Z0 = FINISHED TOP)', 'G21 G90 G17']);
         p.tool(1, 3000, 'OP10 FACE TOP');
         p.faceTop(12);
         p.add('(OP20 MACHINE ROUND BOSS)');
@@ -572,7 +572,7 @@
     const url = URL.createObjectURL(new Blob([machinedSTL()], { type: 'model/stl' }));
     const a = document.createElement('a');
     a.href = url;
-    a.download = `mdm-machined-${$('job').value}.stl`;
+    a.download = `me-machined-${$('job').value}.stl`;
     document.body.append(a);
     a.click();
     a.remove();

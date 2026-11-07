@@ -1,7 +1,8 @@
-/* MDM design system: white base, deep navy and light blue, one sans-serif family.
+/* ME design system: white base, deep navy and light blue, one sans-serif family.
    Shared by every page: header, menus, search, footer, home sections and the app pages. */
 :root {
   color-scheme: light;
+  --logo: #3779F8;
   --navy: #0E2A5C;
   --navy-deep: #081A3D;
   --blue: #1C6FD1;
@@ -76,10 +77,10 @@ a { color: var(--blue); }
 /* ---------- Header ---------- */
 .site-header { position: sticky; top: 0; z-index: 40; background: #fff; border-bottom: 1px solid var(--rule); }
 .header-bar { display: flex; align-items: center; gap: 1.5rem; min-height: var(--header-h); }
-.logo { display: flex; align-items: center; gap: .65rem; color: var(--navy); text-decoration: none; flex: none; }
-.logo svg { flex: none; }
-.logo b { display: block; font: 800 1.5rem/1 var(--display); letter-spacing: .02em; }
-.logo small { display: block; font-size: .75rem; line-height: 1.2; color: var(--muted); font-weight: 500; }
+.logo { display: flex; align-items: center; gap: .8rem; color: var(--logo); text-decoration: none; flex: none; }
+.logo .logo-mark { flex: none; height: 2.1rem; width: auto; }
+.logo small { display: block; max-width: 9.5rem; padding-left: .8rem; border-left: 1.5px solid var(--rule); font-size: .78rem; line-height: 1.25; color: var(--muted); font-weight: 600; }
+[dir="rtl"] .logo small { padding-left: 0; border-left: 0; padding-right: .8rem; border-right: 1.5px solid var(--rule); }
 .main-nav { flex: 1; min-width: 0; }
 .nav-list { display: flex; align-items: center; gap: .25rem; }
 .nav-btn, .nav-link {
@@ -149,11 +150,11 @@ a { color: var(--blue); }
 .site-footer { background: var(--navy-deep); color: #C9D6EA; margin-top: 0; }
 .site-footer a { color: #fff; text-decoration: none; }
 .site-footer a:hover { text-decoration: underline; text-underline-offset: 3px; }
-.footer-grid { display: grid; gap: 2rem; padding-block: 3.5rem 2.5rem; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); }
+.footer-grid { display: grid; gap: 2rem; padding-block: 3.5rem 2.5rem; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); }
 .footer-brand { grid-column: span 2; max-width: 24rem; }
 @media (max-width: 600px) { .footer-brand { grid-column: auto; } }
 .footer-brand .logo { color: #fff; }
-.footer-brand .logo small { color: #9FB3D1; }
+.footer-brand .logo small { color: #9FB3D1; border-color: rgba(255, 255, 255, .25); }
 .footer-brand p { margin-top: 1rem; font-size: .9375rem; }
 .footer-h { color: #fff; font-weight: 700; margin-bottom: .75rem; }
 .footer-grid ul { display: grid; gap: .45rem; font-size: .9375rem; }

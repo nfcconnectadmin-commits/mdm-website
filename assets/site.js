@@ -1,4 +1,4 @@
-/* MDM site behaviour: menus, phone navigation, search, the help box, card rails and quote hand-off. */
+/* ME site behaviour: menus, phone navigation, search, the help box, card rails and quote hand-off. */
 (function () {
   'use strict';
   const script = document.currentScript;
