@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>MDM Sheet Metal Bend Calculator</title>
+<meta name="description" content="Work out bend allowance, bend deduction and the flat blank length for a sheet metal bend, with a drawing of the bent part and the flat pattern.">
+<link rel="canonical" href="https://web-claude.duckdns.org/apps/sheet-metal.html">
+<meta property="og:title" content="MDM Sheet Metal Bend Calculator">
+<meta property="og:description" content="Bend allowance, bend deduction and flat blank length for sheet metal bends.">
+<meta property="og:image" content="https://web-claude.duckdns.org/assets/img/steel.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230E2A5C'/%3E%3Ccircle cx='16' cy='16' r='9.5' fill='none' stroke='%23fff' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='3.5' fill='%234FB3F0'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+<style>
+.figure-svg { width: 100%; height: auto; display: block; }
+.figure-svg text { font: 500 13px var(--body); fill: var(--muted); }
+.figure-svg .dim { stroke: var(--muted); stroke-width: 1; fill: none; }
+.figure-svg .part { fill: #DCE7F3; stroke: var(--navy); stroke-width: 1.5; }
+.figure-svg .bendline { stroke: var(--callout); stroke-width: 1.5; stroke-dasharray: 6 4; }
+.figure-svg .zone { fill: rgba(28, 111, 209, .18); }
+.big { font: 800 1.75rem/1.2 var(--display); color: var(--navy); }
+</style>
+</head>
+<body>
+<!-- site-header -->
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header" id="site-header">
+  <div class="wrap header-bar">
+    <a class="logo" href="../" aria-label="MDM home"><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="10" fill="#0E2A5C"/><circle cx="20" cy="20" r="11.5" fill="none" stroke="#fff" stroke-width="2.2"/><circle cx="20" cy="20" r="4.2" fill="#4FB3F0"/><path d="M20 4v8M20 28v8M4 20h8M28 20h8" stroke="#4FB3F0" stroke-width="2.2" stroke-linecap="round"/></svg><span><b>MDM</b><small>Mechanical Design &amp; Manufacturing</small></span></a>
+    <nav class="main-nav" id="main-nav" aria-label="Main">
+      <ul class="nav-list">
+        <li class="has-mega">
+          <button type="button" class="nav-btn" aria-expanded="false" aria-controls="mega-industries">Industries</button>
+          <div class="mega" id="mega-industries"><div class="wrap mega-inner">
+            <div class="mega-intro"><p class="mega-title">Industries</p><p>Engineering and parts for five sectors, from one design and manufacturing team.</p><a class="text-link" href="../#industries">All industries</a></div>
+            <ul class="mega-links">
+            <li><a href="../industries/steel-fabrication.html"><b>Steel fabrication</b><span>Frames, brackets and welded assemblies</span></a></li>
+            <li><a href="../industries/pumps.html"><b>Pumps and fluid handling</b><span>Impellers, housings, shafts and seals</span></a></li>
+            <li><a href="../industries/oil-gas-piping.html"><b>Oil, gas and piping</b><span>Flanges, fittings and threaded pipe work</span></a></li>
+            <li><a href="../industries/industrial-machinery.html"><b>Industrial machinery</b><span>Gears, shafts, pulleys and machine parts</span></a></li>
+            <li><a href="../industries/automotive.html"><b>Automotive and transport</b><span>Vehicle, truck and off-highway parts</span></a></li>
+            </ul>
+          </div></div>
+        </li>
+        <li class="has-mega">
+          <button type="button" class="nav-btn" aria-expanded="false" aria-controls="mega-services">Services</button>
+          <div class="mega" id="mega-services"><div class="wrap mega-inner">
+            <div class="mega-intro"><p class="mega-title">Services</p><p>Six services that work alone or together, from first sketch to measured part.</p><a class="text-link" href="../services.html">All services</a></div>
+            <ul class="mega-links">
+            <li><a href="../services.html#design"><b>Mechanical design</b><span>Concept to released CAD and drawings</span></a></li>
+            <li><a href="../services.html#analysis"><b>Engineering analysis</b><span>FEA, fatigue and tolerance stack-ups</span></a></li>
+            <li><a href="../services.html#reverse"><b>Reverse engineering</b><span>Rebuild parts from samples and scans</span></a></li>
+            <li><a href="../services.html#prototyping"><b>Prototyping</b><span>3D printing, one-offs and soft tooling</span></a></li>
+            <li><a href="../services.html#manufacturing"><b>Manufacturing</b><span>CNC, sheet metal, fabrication and casting</span></a></li>
+            <li><a href="../services.html#inspection"><b>Inspection and documentation</b><span>Dimensional inspection and reports</span></a></li>
+            </ul>
+          </div></div>
+        </li>
+        <li class="has-mega">
+          <button type="button" class="nav-btn" aria-expanded="false" aria-controls="mega-apps">Apps</button>
+          <div class="mega" id="mega-apps"><div class="wrap mega-inner">
+            <div class="mega-intro"><p class="mega-title">Apps</p><p>Free engineering tools that run in your browser.</p><a class="text-link" href="../apps/">All eleven apps</a></div>
+            <ul class="mega-links">
+            <li><a href="../apps/check-my-part.html"><b>Check My Part</b><span>Open your STL and request a quote</span></a></li>
+            <li><a href="../apps/machining-simulator.html"><b>Machining Simulation</b><span>Watch G-code cut a block in 3D</span></a></li>
+            <li><a href="../apps/part-viewer.html"><b>3D Part Viewer</b><span>Size, section and export parts</span></a></li>
+            <li><a href="../apps/parts-library.html"><b>3D Parts Library</b><span>Eleven adjustable parts</span></a></li>
+            <li><a href="../apps/fits-calculator.html"><b>Fits Calculator</b><span>ISO 286 hole and shaft fits</span></a></li>
+            <li><a href="../apps/cutting-data.html"><b>Cutting Data</b><span>Speed, feed and power</span></a></li>
+            <li><a href="../apps/bolt-circle.html"><b>Bolt Circle</b><span>Hole positions on a circle</span></a></li>
+            <li><a href="../apps/thread-chart.html"><b>Thread and Drill Chart</b><span>Tap drills and clearance holes</span></a></li>
+            <li><a href="../apps/tolerance-guide.html"><b>Tolerance Guide</b><span>Which process holds your number</span></a></li>
+            <li><a href="../apps/sheet-metal.html"><b>Sheet Metal Bends</b><span>Bend allowance and flat blank length</span></a></li>
+            <li><a href="../apps/beam-calculator.html"><b>Beam Calculator</b><span>Bending stress and deflection</span></a></li>
+            </ul>
+          </div></div>
+        </li>
+        <li><a class="nav-link" href="../insights/">Insights</a></li>
+        <li><a class="nav-link" href="../#quote">Contact</a></li>
+        <li class="mobile-cta"><a class="btn btn-primary" href="../#quote">Request a quote</a></li>
+      </ul>
+    </nav>
+    <div class="header-tools">
+      <button class="icon-btn" type="button" id="search-open" aria-label="Search the site"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
+      <a class="lang" href="../ar/" lang="ar" hreflang="ar">العربية</a>
+      <a class="btn btn-primary btn-sm header-cta" href="../#quote">Request a quote</a>
+      <button class="icon-btn menu-btn" type="button" id="menu-open" aria-expanded="false" aria-controls="main-nav" aria-label="Open menu"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    </div>
+  </div>
+</header>
+<div class="search" id="search" role="dialog" aria-modal="true" aria-label="Search the site" hidden>
+  <div class="search-panel">
+    <div class="search-row">
+      <input type="search" id="search-input" placeholder="Search pages, apps and services" aria-label="Search the site" autocomplete="off">
+      <button class="btn btn-sm" type="button" id="search-close">Close search</button>
+    </div>
+    <div class="search-results" id="search-results"></div>
+  </div>
+</div>
+<!-- /site-header -->
+<main class="wrap" id="main">
+  <div class="page-head">
+    <h1>Sheet Metal Bend Calculator</h1>
+    <p>Enter the sheet thickness, inside bend radius, bend angle and the two outside flange lengths. The calculator gives the bend allowance, bend deduction and the length of flat blank to cut.</p>
+  </div>
+  <div class="calc">
+    <form class="panel" id="form" aria-label="Bend inputs">
+      <h2>Inputs</h2>
+      <div class="twoup">
+        <div class="field"><label for="t">Thickness T, mm</label><input id="t" type="number" min="0.1" step="0.1" value="3"></div>
+        <div class="field"><label for="r">Inside radius R, mm</label><input id="r" type="number" min="0" step="0.1" value="3"></div>
+        <div class="field"><label for="a">Bend angle, °</label><input id="a" type="number" min="1" max="170" step="1" value="90"></div>
+        <div class="field"><label for="k">K-factor</label><input id="k" type="number" min="0.1" max="0.5" step="0.01"></div>
+        <div class="field"><label for="l1">Flange 1, outside, mm</label><input id="l1" type="number" min="0" step="0.5" value="50"></div>
+        <div class="field"><label for="l2">Flange 2, outside, mm</label><input id="l2" type="number" min="0" step="0.5" value="30"></div>
+      </div>
+      <label class="check"><input type="checkbox" id="k-auto" checked> Choose the K-factor from R/T</label>
+      <p class="note">The bend angle is how far the sheet is bent, so 90° makes an L shape. Flange lengths are measured on the outside, to where the outer faces would meet.</p>
+      <p class="alert" id="problem" role="alert"></p>
+    </form>
+    <section class="panel" aria-label="Results" aria-live="polite">
+      <h2>Results</h2>
+      <p>Flat blank length: <span class="big" id="r-flat"></span></p>
+      <dl class="data">
+        <div><dt>K-factor used</dt><dd id="r-k"></dd></div>
+        <div><dt>Bend allowance (BA)</dt><dd id="r-ba"></dd></div>
+        <div><dt>Outside setback (OSSB)</dt><dd id="r-ossb"></dd></div>
+        <div><dt>Bend deduction (BD)</dt><dd id="r-bd"></dd></div>
+        <div><dt>Bend line from flange 1 end</dt><dd id="r-line"></dd></div>
+      </dl>
+      <svg class="figure-svg" id="fig" viewBox="0 0 480 290" role="img" aria-label="The bent part and its flat pattern, to scale"></svg>
+      <p class="formula">BA = π × A ÷ 180 × (R + K × T). OSSB = tan(A ÷ 2) × (R + T). BD = 2 × OSSB − BA. Flat length = flange 1 + flange 2 − BD. For more bends, subtract one bend deduction per bend.</p>
+      <p class="note">K-factor depends on material, tooling and the forming method. The automatic value is a common starting rule: 0.33 below R/T of 1, 0.40 up to 3, and 0.50 above. Confirm with a test bend before cutting a batch.</p>
+      <div class="row"><a class="btn" href="../industries/steel-fabrication.html">Steel fabrication</a><a class="btn btn-primary" href="../#quote">Request a quote</a></div>
+    </section>
+  </div>
+</main>
+<div class="page-note"><div class="wrap">Runs in your browser. Nothing you enter here is uploaded or saved.</div></div>
+<!-- site-footer -->
+<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <div class="footer-brand">
+      <a class="logo" href="../"><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="10" fill="#0E2A5C"/><circle cx="20" cy="20" r="11.5" fill="none" stroke="#fff" stroke-width="2.2"/><circle cx="20" cy="20" r="4.2" fill="#4FB3F0"/><path d="M20 4v8M20 28v8M4 20h8M28 20h8" stroke="#4FB3F0" stroke-width="2.2" stroke-linecap="round"/></svg><span><b>MDM</b><small>Mechanical Design &amp; Manufacturing</small></span></a>
+      <p>Mechanical design, analysis, manufacturing and inspection, from first sketch to measured part.</p>
+      <p>Email: <a href="mailto:mahmoudsobhyelagha@gmail.com">mahmoudsobhyelagha@gmail.com</a></p>
+    </div>
+    <div><p class="footer-h">Industries</p><ul><li><a href="../industries/steel-fabrication.html">Steel fabrication</a></li><li><a href="../industries/pumps.html">Pumps and fluid handling</a></li><li><a href="../industries/oil-gas-piping.html">Oil, gas and piping</a></li><li><a href="../industries/industrial-machinery.html">Industrial machinery</a></li><li><a href="../industries/automotive.html">Automotive and transport</a></li></ul></div>
+    <div><p class="footer-h">Services</p><ul><li><a href="../services.html#design">Mechanical design</a></li><li><a href="../services.html#analysis">Engineering analysis</a></li><li><a href="../services.html#reverse">Reverse engineering</a></li><li><a href="../services.html#prototyping">Prototyping</a></li><li><a href="../services.html#manufacturing">Manufacturing</a></li><li><a href="../services.html#inspection">Inspection and documentation</a></li></ul></div>
+    <div><p class="footer-h">Apps</p><ul><li><a href="../apps/check-my-part.html">Check My Part</a></li><li><a href="../apps/machining-simulator.html">Machining Simulation</a></li><li><a href="../apps/part-viewer.html">3D Part Viewer</a></li><li><a href="../apps/parts-library.html">3D Parts Library</a></li><li><a href="../apps/fits-calculator.html">Fits Calculator</a></li><li><a href="../apps/cutting-data.html">Cutting Data</a></li><li><a href="../apps/">All eleven apps</a></li></ul></div>
+    <div><p class="footer-h">Company</p><ul><li><a href="../insights/">Insights</a></li><li><a href="../#quote">Request a quote</a></li><li><a href="../ar/" lang="ar">العربية</a></li></ul></div>
+  </div>
+  <div class="wrap footer-bottom"><span>© <span data-year>2026</span> MDM Mechanical Design &amp; Manufacturing</span><span>Engineered from first sketch to measured part.</span></div>
+</footer>
+<!-- /site-footer -->
+<script>
+(function () {
+  const $ = id => document.getElementById(id);
+  const num = id => parseFloat($(id).value);
+  const f = (v, d = 2) => v.toLocaleString('en-US', { maximumFractionDigits: d, minimumFractionDigits: d });
+  function autoK(r, t) { const q = r / t; return q < 1 ? 0.33 : q <= 3 ? 0.40 : 0.50; }
+  function bend(t, r, a, k, l1, l2) {
+    const rad = a * Math.PI / 180;
+    const ba = rad * (r + k * t);
+    const ossb = Math.tan(rad / 2) * (r + t);
+    const bd = 2 * ossb - ba;
+    return { ba, ossb, bd, flat: l1 + l2 - bd, line: l1 - ossb + ba / 2, seg1: l1 - ossb, seg2: l2 - ossb };
+  }
+  function draw(t, r, a, l1, l2, res) {
+    const svg = $('fig');
+    /* Bent profile: flange 1 along +x, flange 2 turned up by the bend angle, drawn to one scale with the flat pattern. */
+    const rad = a * Math.PI / 180;
+    const seg1 = Math.max(res.seg1, 0), seg2 = Math.max(res.seg2, 0);
+    const steps = 16;
+    /* Outer and inner faces in mm: flange 1 along +x, an arc through the bend angle, then flange 2. */
+    const outer = [[0, 0]], inner = [[0, t]];
+    for (let i = 0; i <= steps; i++) {
+      const th = rad * i / steps;
+      outer.push([seg1 + (r + t) * Math.sin(th), (r + t) - (r + t) * Math.cos(th)]);
+      inner.push([seg1 + r * Math.sin(th), t + r - r * Math.cos(th)]);
+    }
+    const ex = seg1 + (r + t) * Math.sin(rad), ey = (r + t) - (r + t) * Math.cos(rad);
+    const ix = seg1 + r * Math.sin(rad), iy = t + r - r * Math.cos(rad);
+    outer.push([ex + Math.cos(rad) * seg2, ey + Math.sin(rad) * seg2]);
+    inner.push([ix + Math.cos(rad) * seg2, iy + Math.sin(rad) * seg2]);
+    const all = outer.concat(inner);
+    const minX = Math.min(...all.map(p => p[0])), maxX = Math.max(...all.map(p => p[0]));
+    const maxY = Math.max(...all.map(p => p[1]));
+    /* One scale for both drawings, so the bent part fits 40–190 px high and everything fits 420 px wide. */
+    const s = Math.min(420 / Math.max(maxX - minX, res.flat, 1), 150 / Math.max(maxY, 1));
+    const ox = 30, base = 190;
+    const P = ([x, y]) => [ox + (x - minX) * s, base - y * s];
+    const poly = outer.map(P).concat(inner.reverse().map(P)).map(p => p.map(v => v.toFixed(1)).join(',')).join(' ');
+    // Flat pattern below, with the bend zone shaded and the bend line marked.
+    const fy = 240, fh = Math.max(t * s, 6);
+    const fx = v => ox + v * s;
+    const lineX = fx(res.line), right = lineX > 280;
+    svg.innerHTML =
+      `<text x="${ox}" y="24">Bent part</text>` +
+      `<polygon class="part" points="${poly}"/>` +
+      `<text x="${ox}" y="${fy - 14}">Flat pattern, ${f(res.flat, 2)} mm</text>` +
+      `<rect class="part" x="${fx(0)}" y="${fy}" width="${(res.flat * s).toFixed(1)}" height="${fh.toFixed(1)}"/>` +
+      `<rect class="zone" x="${fx(seg1)}" y="${fy}" width="${(res.ba * s).toFixed(1)}" height="${fh.toFixed(1)}"/>` +
+      `<line class="bendline" x1="${lineX}" x2="${lineX}" y1="${fy - 8}" y2="${fy + fh + 8}"/>` +
+      `<text x="${right ? lineX - 6 : lineX + 6}" y="${fy + fh + 22}" text-anchor="${right ? 'end' : 'start'}">Bend line, ${f(res.line, 2)} mm from end</text>`;
+  }
+  function calc() {
+    const t = num('t'), r = num('r'), a = num('a'), l1 = num('l1'), l2 = num('l2');
+    if ($('k-auto').checked && t > 0 && r >= 0) $('k').value = autoK(r, t).toFixed(2);
+    const k = num('k');
+    const ids = ['r-flat', 'r-k', 'r-ba', 'r-ossb', 'r-bd', 'r-line'];
+    if (!(t > 0) || !(r >= 0) || !(a > 0 && a <= 170) || !(k > 0 && k <= 0.5) || !(l1 >= 0) || !(l2 >= 0)) {
+      $('problem').textContent = 'Enter a thickness above 0, a radius of 0 or more, a bend angle from 1 to 170°, and a K-factor from 0.1 to 0.5.';
+      ids.forEach(id => { $(id).textContent = '–'; });
+      $('fig').innerHTML = '';
+      return;
+    }
+    const res = bend(t, r, a, k, l1, l2);
+    const notes = [];
+    if (res.seg1 < 0 || res.seg2 < 0) notes.push('A flange is shorter than the outside setback, so it would disappear into the bend. Make the flanges longer.');
+    if (a > 135) notes.push('Above about 135°, the outside setback becomes very large. Consider dimensioning to the tangent points instead.');
+    $('problem').textContent = notes.join(' ');
+    $('r-flat').textContent = `${f(res.flat)} mm`;
+    $('r-k').textContent = f(k, 2);
+    $('r-ba').textContent = `${f(res.ba, 3)} mm`;
+    $('r-ossb').textContent = `${f(res.ossb, 3)} mm`;
+    $('r-bd').textContent = `${f(res.bd, 3)} mm`;
+    $('r-line').textContent = `${f(res.line, 2)} mm`;
+    draw(t, r, a, l1, l2, res);
+  }
+  $('form').addEventListener('input', e => {
+    if (e.target.id === 'k') $('k-auto').checked = false;
+    calc();
+  });
+  $('form').addEventListener('submit', e => e.preventDefault());
+  calc();
+  window.mdmBend = { bend, autoK };
+})();
+</script>
+<script src="../assets/site.js" defer></script>
+</body>
+</html>

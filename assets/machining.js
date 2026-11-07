@@ -109,18 +109,15 @@
           if (zz <= -depth) break;
         }
       },
-      drill(points, depth) {
-        points.forEach(([x, y]) => {
-          this.to(x, y);
-          this.add('G0 Z2.');
-          for (let z = -8; ; z -= 8) {
-            const zz = Math.max(z, -depth);
-            this.add(`G1 Z${n(zz)} F180`);
-            this.add('G0 Z2.');
-            if (zz <= -depth) break;
-          }
-          this.add('G0 Z10.');
+      /* Drilling with a canned cycle: G83 pecks when a peck depth is given, G81 drills straight. */
+      drill(points, depth, peck) {
+        this.to(points[0][0], points[0][1]);
+        this.add('G0 Z10.');
+        points.forEach(([x, y], i) => {
+          if (i) this.add(`X${n(x)} Y${n(y)}`);
+          else this.add(peck ? `G98 G83 X${n(x)} Y${n(y)} Z${n(-depth)} R2. Q${n(peck)} F180` : `G98 G81 X${n(x)} Y${n(y)} Z${n(-depth)} R2. F180`);
         });
+        this.add('G80');
       },
     };
   }
@@ -136,7 +133,7 @@
         p.add('(OP30 ROUND POCKET)');
         p.circlePocket(92, 40, 34, 12, 4, 4);
         p.tool(3, 3200, 'OP40 DRILL HOLES');
-        p.drill([[92, 11], [92, 69], [37, 40]], 24);
+        p.drill([[92, 11], [92, 69], [37, 40]], 24, 8);
         p.add('G0 Z30.');
         p.add('M30');
         return p.out.join('\n');
@@ -169,7 +166,7 @@
   /* ---------- G-code reader ---------- */
   function parse(text) {
     const moves = [];
-    const state = { x: 60, y: 40, z: 30, f: 0, g: 0, tool: 0, s: 0 };
+    const state = { x: 60, y: 40, z: 30, f: 0, g: 0, tool: 0, s: 0, cycle: 0, cz: null, cr: null, cq: null, retract: 98, init: 30 };
     const lines = text.split(/\r?\n/);
     let label = '';
     for (let i = 0; i < lines.length; i++) {
@@ -190,10 +187,13 @@
       }
       if (!seen) throw new Error(`Line ${i + 1}: this line could not be read: ${raw.trim()}`);
       for (const g of gs) {
-        if ([0, 1, 2, 3].includes(g)) state.g = g;
+        if ([0, 1, 2, 3].includes(g)) { state.g = g; state.cycle = 0; }
+        else if (g === 81 || g === 83) { if (!state.cycle) state.init = state.z; state.cycle = g; }
+        else if (g === 80) state.cycle = 0;
+        else if (g === 98 || g === 99) state.retract = g;
         else if (g === 20) throw new Error(`Line ${i + 1}: inch mode (G20) is not supported. Use millimetres (G21).`);
         else if (g === 91) throw new Error(`Line ${i + 1}: incremental mode (G91) is not supported. Use absolute (G90).`);
-        else if (![17, 21, 40, 49, 54, 80, 90, 94].includes(g)) throw new Error(`Line ${i + 1}: G${g} is not supported. Use G0, G1, G2 or G3 moves.`);
+        else if (![17, 21, 40, 49, 54, 90, 94].includes(g)) throw new Error(`Line ${i + 1}: G${g} is not supported. Use G0, G1, G2, G3, or the drilling cycles G81 and G83.`);
       }
       if ('T' in words) {
         if (!TOOLS[words.T]) throw new Error(`Line ${i + 1}: T${words.T} is not in the tool list. Use T1, T2 or T3.`);
@@ -202,6 +202,45 @@
       if ('F' in words) state.f = words.F;
       if ('S' in words) state.s = words.S;
       if (ms.some(v => v === 30 || v === 2)) break;
+
+      /* Drilling cycles: each line with X or Y drills one hole at that position. */
+      if (state.cycle) {
+        if ('Z' in words) state.cz = words.Z;
+        if ('R' in words) state.cr = words.R;
+        if ('Q' in words) state.cq = words.Q;
+        const startsCycle = gs.includes(81) || gs.includes(83);
+        if (!('X' in words || 'Y' in words || startsCycle)) continue;
+        const where = `Line ${i + 1}: `;
+        if (!state.tool) throw new Error(`${where}select a tool first, for example T3 M6.`);
+        if (!(state.f > 0)) throw new Error(`${where}set a feed rate for the drilling cycle, for example F180.`);
+        if (state.cz === null || state.cr === null) throw new Error(`${where}a drilling cycle needs a depth Z and a start plane R.`);
+        if (state.cr <= state.cz) throw new Error(`${where}the R plane must be above the hole depth Z.`);
+        if (state.cycle === 83 && !(state.cq > 0)) throw new Error(`${where}G83 needs a peck depth Q above zero.`);
+        const x = 'X' in words ? words.X : state.x, y = 'Y' in words ? words.Y : state.y;
+        const base = { line: i, text: raw.trim(), tool: state.tool, s: state.s, label };
+        const mv = (a, b, rapid) => moves.push({ ...base, rapid, f: rapid ? RAPID : state.f, a, b });
+        let z = state.z;
+        if (z < state.cr) { mv([state.x, state.y, z], [state.x, state.y, state.cr], true); z = state.cr; }
+        mv([state.x, state.y, z], [x, y, z], true);
+        if (z !== state.cr) mv([x, y, z], [x, y, state.cr], true);
+        if (state.cycle === 81) {
+          mv([x, y, state.cr], [x, y, state.cz], false);
+        } else {
+          let depth = state.cr;
+          while (depth > state.cz + 1e-9) {
+            const next = Math.max(depth - state.cq, state.cz);
+            if (depth < state.cr) mv([x, y, state.cr], [x, y, depth + 0.5], true);
+            mv([x, y, depth < state.cr ? depth + 0.5 : depth], [x, y, next], false);
+            if (next > state.cz + 1e-9) mv([x, y, next], [x, y, state.cr], true);
+            depth = next;
+          }
+        }
+        const top = state.retract === 99 ? state.cr : Math.max(state.init, state.cr);
+        mv([x, y, state.cz], [x, y, top], true);
+        Object.assign(state, { x, y, z: top });
+        if (moves.length > 400000) throw new Error('This program is too long for the browser simulation.');
+        continue;
+      }
       if (!('X' in words || 'Y' in words || 'Z' in words)) continue;
       if (!state.tool) throw new Error(`Line ${i + 1}: select a tool first, for example T1 M6.`);
       if (state.g !== 0 && !(state.f > 0)) throw new Error(`Line ${i + 1}: set a feed rate first, for example F500.`);
@@ -500,9 +539,45 @@
   $('show-tool').addEventListener('change', () => { toolGroup.visible = $('show-tool').checked; paint(); });
   $('material').addEventListener('change', readouts);
   document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => view.setView(b.dataset.view)));
-  $('legend').innerHTML = `<span><i style="background:#5C6170"></i>Uncut stock</span>` +
-    Object.values(TOOLS).map(t => `<span><i style="background:${t.css}"></i>${t.name}</span>`).join('');
-  $('tool-list').textContent = Object.entries(TOOLS).map(([k, t]) => `T${k} ${t.name}`).join(', ');
+  const KIND = { 1: 'flat end mill', 2: 'flat end mill', 3: 'drill' };
+  function toolText() {
+    Object.entries(TOOLS).forEach(([k, t]) => { t.name = `Ø${n(t.d).replace(/\.$/, '')} ${KIND[k]}`; });
+    $('legend').innerHTML = `<span><i style="background:#5C6170"></i>Uncut stock</span>` +
+      Object.values(TOOLS).map(t => `<span><i style="background:${t.css}"></i>${t.name}</span>`).join('');
+    $('tool-list').textContent = Object.entries(TOOLS).map(([k, t]) => `T${k} ${t.name}`).join(', ');
+  }
+  $('tool-table').innerHTML = Object.entries(TOOLS).map(([k, t]) =>
+    `<div class="field"><label for="tool-${k}">T${k} ${KIND[k]}, Ø mm</label><input id="tool-${k}" type="number" min="0.5" max="40" step="0.1" value="${t.d}"></div>`).join('');
+  Object.keys(TOOLS).forEach(k => $(`tool-${k}`).addEventListener('change', () => {
+    const v = parseFloat($(`tool-${k}`).value);
+    if (!(v >= 0.5 && v <= 40)) { $(`tool-${k}`).value = TOOLS[k].d; return; }
+    TOOLS[k].d = v;
+    sim.tool = 0;
+    toolText();
+    runText(false);
+  }));
+  toolText();
+
+  /* STL of the machined block, with X0 Y0 at the front-left corner and Z0 at the finished top. */
+  function machinedSTL() {
+    const top = new THREE.BufferGeometry();
+    top.setAttribute('position', new THREE.BufferAttribute(positions.slice(), 3));
+    top.setIndex(Array.from(geo.index.array));
+    const b = STOCK.bottom, X = STOCK.x, Y = STOCK.y;
+    const base = new THREE.BufferGeometry();
+    base.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, b, X, Y, b, X, 0, b, 0, 0, b, 0, Y, b, X, Y, b], 3));
+    return MDM3D.toSTL([top, base]);
+  }
+  $('export-stl').addEventListener('click', () => {
+    const url = URL.createObjectURL(new Blob([machinedSTL()], { type: 'model/stl' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `mdm-machined-${$('job').value}.stl`;
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
 
   const reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   $('gcode').value = JOBS.plate.gcode();
@@ -510,5 +585,5 @@
   runText(false);
   if (!reduced) play();
   /* Rendering after an orbit drag while paused goes through the view itself. */
-  window.mdmSim = { sim, advance, paint, readouts, parse, heights, CELL, stride, STOCK };
+  window.mdmSim = { sim, advance, paint, readouts, parse, heights, CELL, stride, STOCK, TOOLS, machinedSTL };
 })();
