@@ -46,6 +46,8 @@ APPS = [
     ('tolerance-guide.html', 'Tolerance Guide', 'Which process holds your number', 'دليل التفاوتات', 'أي عملية تحقق التفاوت المطلوب'),
     ('sheet-metal.html', 'Sheet Metal Bends', 'Bend allowance and flat blank length', 'ثني الصاج', 'سماحية الثني وطول القطعة المسطحة'),
     ('beam-calculator.html', 'Beam Calculator', 'Bending stress and deflection', 'حاسبة الكمرات', 'إجهاد الانحناء والانحراف'),
+    ('bolt-torque.html', 'Bolt Torque', 'Tightening torque and clamp force', 'عزم ربط البراغي', 'عزم الربط وقوة الشد المسبق'),
+    ('pump-calculator.html', 'Pump Calculator', 'Power, motor size and affinity laws', 'حاسبة المضخات', 'القدرة وحجم المحرك وقوانين التشابه'),
 ]
 
 T = {
@@ -54,7 +56,7 @@ T = {
                ind_intro='Engineering and parts for five sectors, from one design and manufacturing team.',
                svc_intro='Six services that work alone or together, from first sketch to measured part.',
                app_intro='Free engineering tools that run in your browser.',
-               all_ind='All industries', all_svc='All services', all_apps='All eleven apps',
+               all_ind='All industries', all_svc='All services', all_apps='All apps',
                search='Search the site', search_ph='Search pages, apps and services', close='Close search', menu='Open menu',
                lang_label='العربية', lang_attr='ar', foot_text='Mechanical design, analysis, manufacturing and inspection, from first sketch to measured part.',
                company='Company', email_label='Email', rights='MDM Mechanical Design &amp; Manufacturing', foot_line='Engineered from first sketch to measured part.'),
@@ -63,7 +65,7 @@ T = {
                ind_intro='هندسة وقطع لخمسة قطاعات، من فريق واحد للتصميم والتصنيع.',
                svc_intro='ست خدمات تعمل منفردة أو مجتمعة، من الرسم الأولي حتى القطعة المقاسة.',
                app_intro='أدوات هندسية مجانية تعمل في متصفحك، باللغة الإنجليزية حالياً.',
-               all_ind='كل القطاعات', all_svc='كل الخدمات', all_apps='كل التطبيقات الأحد عشر',
+               all_ind='كل القطاعات', all_svc='كل الخدمات', all_apps='كل التطبيقات',
                search='البحث في الموقع', search_ph='ابحث في الصفحات والتطبيقات والخدمات', close='إغلاق البحث', menu='فتح القائمة',
                lang_label='English', lang_attr='en', foot_text='التصميم الميكانيكي والتحليل والتصنيع والفحص، من الرسم الأولي حتى القطعة المقاسة.',
                company='الشركة', email_label='البريد', rights='MDM للتصميم والتصنيع الميكانيكي', foot_line='هندسة من الرسم الأولي حتى القطعة المقاسة.'),

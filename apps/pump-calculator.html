@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>MDM Pump Calculator</title>
+<meta name="description" content="Pump hydraulic and shaft power, a suggested motor size, and how flow, head and power change with speed or impeller diameter.">
+<link rel="canonical" href="https://web-claude.duckdns.org/apps/pump-calculator.html">
+<meta property="og:title" content="MDM Pump Calculator">
+<meta property="og:description" content="Pump power, motor size and affinity laws for speed and impeller changes.">
+<meta property="og:image" content="https://web-claude.duckdns.org/assets/img/pumps.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230E2A5C'/%3E%3Ccircle cx='16' cy='16' r='9.5' fill='none' stroke='%23fff' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='3.5' fill='%234FB3F0'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+<style>
+.big { font: 800 1.9rem/1.2 var(--display); color: var(--navy); }
+.curve { width: 100%; height: auto; display: block; }
+.curve text { font: 500 12px var(--body); fill: var(--muted); }
+</style>
+</head>
+<body>
+<!-- site-header -->
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header" id="site-header">
+  <div class="wrap header-bar">
+    <a class="logo" href="../" aria-label="MDM home"><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="10" fill="#0E2A5C"/><circle cx="20" cy="20" r="11.5" fill="none" stroke="#fff" stroke-width="2.2"/><circle cx="20" cy="20" r="4.2" fill="#4FB3F0"/><path d="M20 4v8M20 28v8M4 20h8M28 20h8" stroke="#4FB3F0" stroke-width="2.2" stroke-linecap="round"/></svg><span><b>MDM</b><small>Mechanical Design &amp; Manufacturing</small></span></a>
+    <nav class="main-nav" id="main-nav" aria-label="Main">
+      <ul class="nav-list">
+        <li class="has-mega">
+          <button type="button" class="nav-btn" aria-expanded="false" aria-controls="mega-industries">Industries</button>
+          <div class="mega" id="mega-industries"><div class="wrap mega-inner">
+            <div class="mega-intro"><p class="mega-title">Industries</p><p>Engineering and parts for five sectors, from one design and manufacturing team.</p><a class="text-link" href="../#industries">All industries</a></div>
+            <ul class="mega-links">
+            <li><a href="../industries/steel-fabrication.html"><b>Steel fabrication</b><span>Frames, brackets and welded assemblies</span></a></li>
+            <li><a href="../industries/pumps.html"><b>Pumps and fluid handling</b><span>Impellers, housings, shafts and seals</span></a></li>
+            <li><a href="../industries/oil-gas-piping.html"><b>Oil, gas and piping</b><span>Flanges, fittings and threaded pipe work</span></a></li>
+            <li><a href="../industries/industrial-machinery.html"><b>Industrial machinery</b><span>Gears, shafts, pulleys and machine parts</span></a></li>
+            <li><a href="../industries/automotive.html"><b>Automotive and transport</b><span>Vehicle, truck and off-highway parts</span></a></li>
+            </ul>
+          </div></div>
+        </li>
+        <li class="has-mega">
+          <button type="button" class="nav-btn" aria-expanded="false" aria-controls="mega-services">Services</button>
+          <div class="mega" id="mega-services"><div class="wrap mega-inner">
+            <div class="mega-intro"><p class="mega-title">Services</p><p>Six services that work alone or together, from first sketch to measured part.</p><a class="text-link" href="../services.html">All services</a></div>
+            <ul class="mega-links">
+            <li><a href="../services.html#design"><b>Mechanical design</b><span>Concept to released CAD and drawings</span></a></li>
+            <li><a href="../services.html#analysis"><b>Engineering analysis</b><span>FEA, fatigue and tolerance stack-ups</span></a></li>
+            <li><a href="../services.html#reverse"><b>Reverse engineering</b><span>Rebuild parts from samples and scans</span></a></li>
+            <li><a href="../services.html#prototyping"><b>Prototyping</b><span>3D printing, one-offs and soft tooling</span></a></li>
+            <li><a href="../services.html#manufacturing"><b>Manufacturing</b><span>CNC, sheet metal, fabrication and casting</span></a></li>
+            <li><a href="../services.html#inspection"><b>Inspection and documentation</b><span>Dimensional inspection and reports</span></a></li>
+            </ul>
+          </div></div>
+        </li>
+        <li class="has-mega">
+          <button type="button" class="nav-btn" aria-expanded="false" aria-controls="mega-apps">Apps</button>
+          <div class="mega" id="mega-apps"><div class="wrap mega-inner">
+            <div class="mega-intro"><p class="mega-title">Apps</p><p>Free engineering tools that run in your browser.</p><a class="text-link" href="../apps/">All apps</a></div>
+            <ul class="mega-links">
+            <li><a href="../apps/check-my-part.html"><b>Check My Part</b><span>Open your STL and request a quote</span></a></li>
+            <li><a href="../apps/machining-simulator.html"><b>Machining Simulation</b><span>Watch G-code cut a block in 3D</span></a></li>
+            <li><a href="../apps/part-viewer.html"><b>3D Part Viewer</b><span>Size, section and export parts</span></a></li>
+            <li><a href="../apps/parts-library.html"><b>3D Parts Library</b><span>Eleven adjustable parts</span></a></li>
+            <li><a href="../apps/fits-calculator.html"><b>Fits Calculator</b><span>ISO 286 hole and shaft fits</span></a></li>
+            <li><a href="../apps/cutting-data.html"><b>Cutting Data</b><span>Speed, feed and power</span></a></li>
+            <li><a href="../apps/bolt-circle.html"><b>Bolt Circle</b><span>Hole positions on a circle</span></a></li>
+            <li><a href="../apps/thread-chart.html"><b>Thread and Drill Chart</b><span>Tap drills and clearance holes</span></a></li>
+            <li><a href="../apps/tolerance-guide.html"><b>Tolerance Guide</b><span>Which process holds your number</span></a></li>
+            <li><a href="../apps/sheet-metal.html"><b>Sheet Metal Bends</b><span>Bend allowance and flat blank length</span></a></li>
+            <li><a href="../apps/beam-calculator.html"><b>Beam Calculator</b><span>Bending stress and deflection</span></a></li>
+            <li><a href="../apps/bolt-torque.html"><b>Bolt Torque</b><span>Tightening torque and clamp force</span></a></li>
+            <li><a href="../apps/pump-calculator.html"><b>Pump Calculator</b><span>Power, motor size and affinity laws</span></a></li>
+            </ul>
+          </div></div>
+        </li>
+        <li><a class="nav-link" href="../insights/">Insights</a></li>
+        <li><a class="nav-link" href="../#quote">Contact</a></li>
+        <li class="mobile-cta"><a class="btn btn-primary" href="../#quote">Request a quote</a></li>
+      </ul>
+    </nav>
+    <div class="header-tools">
+      <button class="icon-btn" type="button" id="search-open" aria-label="Search the site"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
+      <a class="lang" href="../ar/" lang="ar" hreflang="ar">العربية</a>
+      <a class="btn btn-primary btn-sm header-cta" href="../#quote">Request a quote</a>
+      <button class="icon-btn menu-btn" type="button" id="menu-open" aria-expanded="false" aria-controls="main-nav" aria-label="Open menu"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    </div>
+  </div>
+</header>
+<div class="search" id="search" role="dialog" aria-modal="true" aria-label="Search the site" hidden>
+  <div class="search-panel">
+    <div class="search-row">
+      <input type="search" id="search-input" placeholder="Search pages, apps and services" aria-label="Search the site" autocomplete="off">
+      <button class="btn btn-sm" type="button" id="search-close">Close search</button>
+    </div>
+    <div class="search-results" id="search-results"></div>
+  </div>
+</div>
+<!-- /site-header -->
+<main class="wrap" id="main">
+  <div class="page-head">
+    <h1>Pump Calculator</h1>
+    <p>Work out the power a pump needs for a given flow and head, and a motor size to match. Then see how flow, head and power change if you run the pump at another speed or trim the impeller.</p>
+  </div>
+  <div class="calc">
+    <form class="panel" id="form" aria-label="Pump inputs">
+      <h2>Duty point</h2>
+      <div class="twoup">
+        <div class="field"><label for="q">Flow, m³/h</label><input id="q" type="number" min="0.01" step="0.5" value="50"></div>
+        <div class="field"><label for="h">Head, m</label><input id="h" type="number" min="0.01" step="0.5" value="30"></div>
+      </div>
+      <div class="field">
+        <label for="fluid">Fluid</label>
+        <select id="fluid">
+          <option value="1000">Water (1000 kg/m³)</option>
+          <option value="1025">Seawater (1025 kg/m³)</option>
+          <option value="850">Diesel (about 850 kg/m³)</option>
+          <option value="custom">Other density</option>
+        </select>
+      </div>
+      <div class="twoup">
+        <div class="field"><label for="rho">Density, kg/m³</label><input id="rho" type="number" min="100" max="3000" step="1" value="1000"></div>
+        <div class="field"><label for="eta">Pump efficiency, %</label><input id="eta" type="number" min="5" max="95" step="1" value="70"></div>
+      </div>
+      <div class="field"><label for="bar">Or enter a pressure rise, bar, to set the head</label><input id="bar" type="number" min="0" step="0.1" placeholder="e.g. 3"></div>
+
+      <h2 style="margin-top:.5rem">Change speed or impeller</h2>
+      <div class="twoup">
+        <div class="field"><label for="n1">Present speed, rpm</label><input id="n1" type="number" min="1" step="10" value="2900"></div>
+        <div class="field"><label for="n2">New speed, rpm</label><input id="n2" type="number" min="1" step="10" value="1450"></div>
+        <div class="field"><label for="d1">Present impeller Ø, mm</label><input id="d1" type="number" min="1" step="1" value="200"></div>
+        <div class="field"><label for="d2">New impeller Ø, mm</label><input id="d2" type="number" min="1" step="1" value="200"></div>
+      </div>
+      <p class="alert" id="problem" role="alert"></p>
+    </form>
+
+    <section class="panel" aria-label="Results" aria-live="polite">
+      <h2>Power and motor</h2>
+      <p>Shaft power: <span class="big" id="r-shaft"></span></p>
+      <dl class="data">
+        <div><dt>Hydraulic power</dt><dd id="r-hyd"></dd></div>
+        <div><dt>Suggested motor, with 15% margin</dt><dd id="r-motor"></dd></div>
+        <div><dt>Pressure rise</dt><dd id="r-dp"></dd></div>
+      </dl>
+      <h2 style="margin-top:.5rem">At the new speed and impeller</h2>
+      <dl class="data">
+        <div><dt>Flow</dt><dd id="a-q"></dd></div>
+        <div><dt>Head</dt><dd id="a-h"></dd></div>
+        <div><dt>Shaft power</dt><dd id="a-p"></dd></div>
+      </dl>
+      <svg class="curve" id="curve" viewBox="0 0 440 220" role="img" aria-label="System curve with the duty point before and after the change"></svg>
+      <p class="formula">Hydraulic power = ρ × g × Q × H. Shaft power = hydraulic power ÷ pump efficiency. Affinity laws: flow changes with speed and diameter, head with their square, and power with their cube.</p>
+      <p class="note">The affinity laws are exact for speed changes and an approximation for small impeller trims, within about 10–20%. Check against the maker's pump curve, NPSH and the motor's full-load rating before you change a duty.</p>
+      <div class="row"><a class="btn" href="../industries/pumps.html">Pumps and fluid handling</a><a class="btn btn-primary" href="../#quote">Request a quote</a></div>
+    </section>
+  </div>
+</main>
+<div class="page-note"><div class="wrap">Runs in your browser. Nothing you enter here is uploaded or saved.</div></div>
+<!-- site-footer -->
+<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <div class="footer-brand">
+      <a class="logo" href="../"><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="10" fill="#0E2A5C"/><circle cx="20" cy="20" r="11.5" fill="none" stroke="#fff" stroke-width="2.2"/><circle cx="20" cy="20" r="4.2" fill="#4FB3F0"/><path d="M20 4v8M20 28v8M4 20h8M28 20h8" stroke="#4FB3F0" stroke-width="2.2" stroke-linecap="round"/></svg><span><b>MDM</b><small>Mechanical Design &amp; Manufacturing</small></span></a>
+      <p>Mechanical design, analysis, manufacturing and inspection, from first sketch to measured part.</p>
+      <p>Email: <a href="mailto:mahmoudsobhyelagha@gmail.com">mahmoudsobhyelagha@gmail.com</a></p>
+    </div>
+    <div><p class="footer-h">Industries</p><ul><li><a href="../industries/steel-fabrication.html">Steel fabrication</a></li><li><a href="../industries/pumps.html">Pumps and fluid handling</a></li><li><a href="../industries/oil-gas-piping.html">Oil, gas and piping</a></li><li><a href="../industries/industrial-machinery.html">Industrial machinery</a></li><li><a href="../industries/automotive.html">Automotive and transport</a></li></ul></div>
+    <div><p class="footer-h">Services</p><ul><li><a href="../services.html#design">Mechanical design</a></li><li><a href="../services.html#analysis">Engineering analysis</a></li><li><a href="../services.html#reverse">Reverse engineering</a></li><li><a href="../services.html#prototyping">Prototyping</a></li><li><a href="../services.html#manufacturing">Manufacturing</a></li><li><a href="../services.html#inspection">Inspection and documentation</a></li></ul></div>
+    <div><p class="footer-h">Apps</p><ul><li><a href="../apps/check-my-part.html">Check My Part</a></li><li><a href="../apps/machining-simulator.html">Machining Simulation</a></li><li><a href="../apps/part-viewer.html">3D Part Viewer</a></li><li><a href="../apps/parts-library.html">3D Parts Library</a></li><li><a href="../apps/fits-calculator.html">Fits Calculator</a></li><li><a href="../apps/cutting-data.html">Cutting Data</a></li><li><a href="../apps/">All apps</a></li></ul></div>
+    <div><p class="footer-h">Company</p><ul><li><a href="../insights/">Insights</a></li><li><a href="../#quote">Request a quote</a></li><li><a href="../ar/" lang="ar">العربية</a></li></ul></div>
+  </div>
+  <div class="wrap footer-bottom"><span>© <span data-year>2026</span> MDM Mechanical Design &amp; Manufacturing</span><span>Engineered from first sketch to measured part.</span></div>
+</footer>
+<!-- /site-footer -->
+<script>
+(function () {
+  const $ = id => document.getElementById(id);
+  const num = id => parseFloat($(id).value);
+  const G = 9.81;
+  /* Standard IEC motor ratings, kW */
+  const MOTORS = [0.37, 0.55, 0.75, 1.1, 1.5, 2.2, 3, 4, 5.5, 7.5, 11, 15, 18.5, 22, 30, 37, 45, 55, 75, 90, 110, 132, 160, 200, 250, 315, 355, 400, 450, 500];
+  const f = (v, d) => v.toLocaleString('en-US', { maximumFractionDigits: d, minimumFractionDigits: d });
+  function pump(q, h, rho, eta) {
+    const hyd = rho * G * (q / 3600) * h / 1000;
+    const shaft = hyd / (eta / 100);
+    const need = shaft * 1.15;
+    const motor = MOTORS.find(m => m >= need);
+    return { hyd, shaft, motor, dp: rho * G * h / 1e5 };
+  }
+  function affinity(q, h, p, n1, n2, d1, d2) {
+    const r = (n2 / n1) * (d2 / d1);
+    return { q: q * r, h: h * r * r, p: p * r ** 3 };
+  }
+  function curve(q, h, a) {
+    /* A simple system curve through the origin and the duty point, H = c·Q², with both duty points marked. */
+    const svg = $('curve');
+    const qMax = Math.max(q, a.q) * 1.3, hMax = Math.max(h, a.h) * 1.3;
+    const X = v => 50 + v / qMax * 370, Y = v => 190 - v / hMax * 170;
+    const c = h / (q * q);
+    /* Draw the curve only up to the top of the chart, ending exactly where it leaves the frame. */
+    const qTop = Math.min(qMax, Math.sqrt(hMax / c));
+    const pts = Array.from({ length: 31 }, (_, i) => { const x = qTop * i / 30; return `${X(x).toFixed(1)},${Y(c * x * x).toFixed(1)}`; }).join(' ');
+    svg.innerHTML = `<path d="M50 20V190H420" fill="none" stroke="#C6CCD6"/>` +
+      `<polyline points="${pts}" fill="none" stroke="#1C6FD1" stroke-width="2.5"/>` +
+      `<circle cx="${X(q)}" cy="${Y(h)}" r="6" fill="#0E2A5C"/><circle cx="${X(a.q)}" cy="${Y(a.h)}" r="6" fill="#B5420A"/>` +
+      `<text x="${X(q) - 10}" y="${Y(h) - 10}" text-anchor="end">Now</text><text x="${X(a.q) - 10}" y="${Y(a.h) - 10}" text-anchor="end">New</text>` +
+      `<text x="420" y="208" text-anchor="end">Flow</text><text x="44" y="16" text-anchor="end">Head</text>` +
+      `<text x="56" y="34">System curve, H ∝ Q²</text>`;
+  }
+  function calc() {
+    if ($('fluid').value !== 'custom') $('rho').value = $('fluid').value;
+    const rho = num('rho');
+    if ($('bar').value !== '' && num('bar') > 0 && document.activeElement === $('bar')) $('h').value = (num('bar') * 1e5 / (rho * G)).toFixed(2);
+    const q = num('q'), h = num('h'), eta = num('eta'), n1 = num('n1'), n2 = num('n2'), d1 = num('d1'), d2 = num('d2');
+    if (![q, h, rho, eta, n1, n2, d1, d2].every(v => v > 0) || eta > 95) {
+      $('problem').textContent = 'Enter values above zero, and a pump efficiency up to 95%.';
+      return;
+    }
+    const notes = [];
+    if (d2 > d1) notes.push('A larger impeller may not fit the casing. Check with the pump maker.');
+    if (d2 < d1 * 0.8) notes.push('Trims beyond about 20% make the affinity laws unreliable.');
+    $('problem').textContent = notes.join(' ');
+    const r = pump(q, h, rho, eta);
+    $('r-shaft').textContent = `${f(r.shaft, 2)} kW`;
+    $('r-hyd').textContent = `${f(r.hyd, 2)} kW`;
+    $('r-motor').textContent = r.motor ? `${r.motor} kW` : 'Above 500 kW, ask us';
+    $('r-dp').textContent = `${f(r.dp, 2)} bar`;
+    const a = affinity(q, h, r.shaft, n1, n2, d1, d2);
+    $('a-q').textContent = `${f(a.q, 1)} m³/h`;
+    $('a-h').textContent = `${f(a.h, 1)} m`;
+    $('a-p').textContent = `${f(a.p, 2)} kW`;
+    curve(q, h, a);
+  }
+  $('rho').addEventListener('input', () => { $('fluid').value = 'custom'; });
+  $('h').addEventListener('input', () => { $('bar').value = ''; });
+  $('form').addEventListener('input', calc);
+  $('form').addEventListener('change', calc);
+  $('form').addEventListener('submit', e => e.preventDefault());
+  calc();
+  window.mdmPump = { pump, affinity };
+})();
+</script>
+<script src="../assets/site.js" defer></script>
+</body>
+</html>
