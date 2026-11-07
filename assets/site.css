@@ -234,7 +234,8 @@ a.card:hover { box-shadow: var(--shadow); border-color: var(--ice-2); transform:
 .grid-3 { display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); }
 .service { background: #fff; border: 1px solid var(--rule); border-radius: var(--r); padding: 1.5rem 1.4rem; display: grid; gap: .6rem; align-content: start; color: var(--ink); text-decoration: none; }
 a.service:hover { border-color: var(--blue); box-shadow: var(--shadow); }
-.service .ico { width: 3rem; height: 3rem; border-radius: 12px; background: var(--ice); color: var(--blue); display: grid; place-items: center; }
+.ico { width: 3rem; height: 3rem; border-radius: 12px; background: var(--ice); color: var(--blue); display: grid; place-items: center; }
+.section.ice .ico:not(.service .ico) { background: #fff; }
 .service h3 { font: 800 1.1875rem/1.3 var(--display); color: var(--navy); }
 .service p { color: var(--muted); font-size: .975rem; line-height: 1.55; }
 

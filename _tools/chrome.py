@@ -74,15 +74,16 @@ def links(items, base, lang, folder, page_suffix='.html', anchor=False):
     out = []
     for key, en, en_d, ar, ar_d in items:
         name, desc = (ar, ar_d) if lang == 'ar' else (en, en_d)
-        url = f'{base}services.html#{key}' if anchor else (f'{base}{folder}{key}' + ('' if key.endswith('.html') else page_suffix))
+        loc = 'ar/' if lang == 'ar' and folder != 'apps/' else ''
+        url = f'{base}{loc}services.html#{key}' if anchor else (f'{base}{loc}{folder}{key}' + ('' if key.endswith('.html') else page_suffix))
         out.append(f'<li><a href="{url}"><b>{name}</b><span>{desc}</span></a></li>')
     return '\n            '.join(out)
 
 
-def header(lang, P):
+def header(lang, P, other=None):
     t = T[lang]
     home = (P + ('ar/' if lang == 'ar' else '')) or './'
-    other = (P if lang == 'ar' else P + 'ar/') or './'
+    other = other or (P if lang == 'ar' else P + 'ar/') or './'
     quote = home + '#quote'
     def mega(mid, title, intro, all_label, all_url, items):
         return f'''<li class="has-mega">
@@ -102,7 +103,7 @@ def header(lang, P):
     <nav class="main-nav" id="main-nav" aria-label="{t['main']}">
       <ul class="nav-list">
         {mega('industries', t['industries'], t['ind_intro'], t['all_ind'], home + '#industries', links(INDUSTRIES, P, lang, 'industries/'))}
-        {mega('services', t['services'], t['svc_intro'], t['all_svc'], P + 'services.html', links(SERVICES, P, lang, '', anchor=True))}
+        {mega('services', t['services'], t['svc_intro'], t['all_svc'], P + ('ar/' if lang == 'ar' else '') + 'services.html', links(SERVICES, P, lang, '', anchor=True))}
         {mega('apps', t['apps'], t['app_intro'], t['all_apps'], P + 'apps/', links(APPS, P, lang, 'apps/'))}
         <li><a class="nav-link" href="{P}insights/">{t['insights']}</a></li>
         <li><a class="nav-link" href="{quote}">{t['contact']}</a></li>
@@ -134,8 +135,9 @@ def footer(lang, P):
     home = (P + ('ar/' if lang == 'ar' else '')) or './'
     def col(title, items):
         return f'<div><p class="footer-h">{title}</p><ul>' + ''.join(items) + '</ul></div>'
-    ind = [f'<li><a href="{P}industries/{k}.html">{ar if lang == "ar" else en}</a></li>' for k, en, _, ar, _ in INDUSTRIES]
-    svc = [f'<li><a href="{P}services.html#{k}">{ar if lang == "ar" else en}</a></li>' for k, en, _, ar, _ in SERVICES]
+    loc = 'ar/' if lang == 'ar' else ''
+    ind = [f'<li><a href="{P}{loc}industries/{k}.html">{ar if lang == "ar" else en}</a></li>' for k, en, _, ar, _ in INDUSTRIES]
+    svc = [f'<li><a href="{P}{loc}services.html#{k}">{ar if lang == "ar" else en}</a></li>' for k, en, _, ar, _ in SERVICES]
     app = [f'<li><a href="{P}apps/{k}">{ar if lang == "ar" else en}</a></li>' for k, en, _, ar, _ in APPS[:6]]
     app.append(f'<li><a href="{P}apps/">{t["all_apps"]}</a></li>')
     comp = [f'<li><a href="{P}insights/">{t["insights"]}</a></li>', f'<li><a href="{home}#quote">{t["quote"]}</a></li>',
@@ -163,14 +165,18 @@ def process(path):
     depth = rel.count('/')
     P = '../' * depth
     lang = 'ar' if rel.startswith('ar/') else 'en'
+    twin = rel[3:] if lang == 'ar' else 'ar/' + rel
+    other = None
+    if os.path.exists(os.path.join(ROOT, twin)):
+        other = (P + twin[:-len('index.html')] if twin.endswith('index.html') else P + twin) or './'
     s = open(path, encoding='utf-8', newline='').read().replace('\r\n', '\n')
     before = s
 
     # Header
     if '<!-- site-header -->' in s:
-        s = re.sub(r'<!-- site-header -->.*?<!-- /site-header -->', lambda m: header(lang, P), s, flags=re.S)
+        s = re.sub(r'<!-- site-header -->.*?<!-- /site-header -->', lambda m: header(lang, P, other), s, flags=re.S)
     elif re.search(r'<div class="top">\s*<header class="wrap topbar">.*?</header>\s*</div>', s, re.S):
-        s = re.sub(r'<div class="top">\s*<header class="wrap topbar">.*?</header>\s*</div>', lambda m: header(lang, P), s, count=1, flags=re.S)
+        s = re.sub(r'<div class="top">\s*<header class="wrap topbar">.*?</header>\s*</div>', lambda m: header(lang, P, other), s, count=1, flags=re.S)
     else:
         print('  no header slot:', rel)
 
