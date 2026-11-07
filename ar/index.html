@@ -1,0 +1,989 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>MDM للتصميم والتصنيع الميكانيكي</title>
+<meta name="description" content="تقدّم MDM خدمات التصميم الميكانيكي والتحليل الهندسي والتصنيع والفحص، من الرسم الأولي حتى القطعة المقاسة.">
+<link rel="canonical" href="https://web-claude.duckdns.org/ar/">
+<link rel="alternate" hreflang="en" href="https://web-claude.duckdns.org/">
+<link rel="alternate" hreflang="ar" href="https://web-claude.duckdns.org/ar/">
+<meta property="og:title" content="MDM | التصميم والتصنيع الميكانيكي">
+<meta property="og:description" content="التصميم الميكانيكي والتحليل الهندسي والتصنيع والفحص، من الرسم الأولي حتى القطعة المقاسة.">
+<meta property="og:locale" content="ar_SA">
+<meta property="og:url" content="https://web-claude.duckdns.org/ar/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MDM Mechanical Design & Manufacturing">
+<meta property="og:image" content="https://web-claude.duckdns.org/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="MDM للتصميم والتصنيع الميكانيكي، مع رسم هندسي لشفة">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "name": "MDM Mechanical Design & Manufacturing",
+  "alternateName": "MDM",
+  "url": "https://web-claude.duckdns.org/",
+  "image": "https://web-claude.duckdns.org/og-image.png",
+  "email": "mahmoudsobhyelagha@gmail.com",
+  "description": "Mechanical design, engineering analysis, reverse engineering, prototyping, manufacturing and inspection.",
+  "knowsAbout": ["Mechanical design", "CAD", "Finite element analysis", "GD&T", "Reverse engineering", "Prototyping", "CNC machining", "Sheet metal fabrication", "Casting", "Dimensional inspection"]
+}
+</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%2318246E'/%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='%23fff' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='3.5' fill='%23FF9A5C'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Carlito:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&family=Noto+Sans+Arabic:wght@400;600;700&family=Tinos:wght@400;700&display=swap">
+<style>
+/* Layout concept: a white sheet opens the page with one drawn part;
+   below it, the site reads as an engineering data sheet that ends in a drawing title block. */
+:root {
+  color-scheme: light;
+  --bg: #FFFFFF;
+  --surface: #FFFFFF;
+  --ink: #12161F;
+  --muted: #535D70;
+  --rule: #C6CCD6;
+  --accent: #2A3CB8;
+  --callout: #B5420A;
+  --ok: #17693F;
+  --warn: #8A5A00;
+  --off: #697386;
+  --bar: #2A3CB8;
+
+  /* Top section and drawing colours, on white. */
+  --dykem: #FFFFFF;
+  --dykem-deep: #FFFFFF;
+  --scribe: #2A3040;
+  --scribe-dim: #535D70;
+  --flag: #B5420A;
+
+  --display: "Times New Roman", "Tinos", "Noto Naskh Arabic", Times, serif;
+  --body: "Calibri", "Carlito", "Noto Sans Arabic", "Segoe UI", Arial, sans-serif;
+  --mono: "Calibri", "Carlito", "Noto Sans Arabic", "Segoe UI", Arial, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 1.125rem/1.6 var(--body); }
+h1, h2, h3, p, ol, ul, dl, dd, figure { margin: 0; padding: 0; }
+ol, ul { list-style: none; }
+a { color: var(--accent); }
+:focus-visible { outline: 3px solid var(--callout); outline-offset: 2px; }
+.wrap {
+  width: 100%; max-width: 78rem; margin-inline: auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+@media (min-width: 720px) {
+  .wrap {
+    padding-left: max(32px, env(safe-area-inset-left, 0px));
+    padding-right: max(32px, env(safe-area-inset-right, 0px));
+  }
+}
+.mono { font-family: var(--mono); font-size: .9375rem; }
+.skip { position: absolute; left: -999px; top: 8px; background: #fff; color: #111; padding: .5rem 1rem; z-index: 5; }
+.skip:focus { left: 16px; }
+
+/* Plate: header and hero */
+.plate { background: var(--dykem); color: var(--ink); border-bottom: 1px solid var(--rule); }
+.topbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem 2rem; padding-block: 1.1rem; }
+.brand { display: flex; align-items: center; gap: .7rem; color: var(--ink); text-decoration: none; }
+.brand b { font: 700 1.625rem/1 var(--display); letter-spacing: .03em; }
+.brand span { font: 400 .875rem/1.25 var(--mono); color: var(--scribe-dim); }
+.topnav { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem 1.5rem; }
+.topnav a { color: var(--scribe); font-size: .9375rem; text-decoration: none; padding-block: .35rem; }
+.topnav a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+:where(.plate) :focus-visible { outline-color: var(--flag); }
+
+.hero { display: grid; gap: 2rem; padding-block: 2rem 3rem; align-items: center; }
+.hero > * { min-width: 0; }
+@media (min-width: 1000px) {
+  .hero { grid-template-columns: minmax(0, 5fr) minmax(0, 8fr); gap: 3.5rem; padding-block: 2.5rem 4rem; }
+}
+.hero h1 {
+  font: 700 clamp(2.5rem, 5.4vw, 4.25rem)/1.02 var(--display); letter-spacing: -.01em; text-wrap: balance;
+}
+.hero p { margin-top: 1.25rem; max-width: 34rem; color: var(--scribe); font-size: 1.125rem; }
+.actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.75rem; }
+.btn {
+  display: inline-block; padding: .8rem 1.3rem; border: 1px solid transparent; border-radius: 2px;
+  font: 600 1rem/1.2 var(--body); text-decoration: none; cursor: pointer;
+}
+.btn-flag { background: var(--flag); color: #FFFFFF; }
+.btn-flag:hover { background: #96360A; }
+.btn-line { border-color: var(--scribe-dim); color: var(--ink); background: transparent; }
+.btn-line:hover { background: var(--rule); }
+
+/* Drawing */
+.sheet { background: var(--dykem-deep); border: 1px solid #C6CCD6; }
+.stages { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-bottom: 1px solid #C6CCD6; }
+.stages button {
+  appearance: none; background: transparent; border: 0; border-right: 1px solid #C6CCD6; color: var(--scribe-dim);
+  padding: .7rem .25rem; font: 500 .9375rem/1.2 var(--mono); cursor: pointer;
+}
+.stages button:last-child { border-right: 0; }
+.stages button:hover { color: var(--ink); }
+.stages button[aria-selected="true"] { background: var(--dykem); color: var(--ink); box-shadow: inset 0 -3px 0 var(--flag); }
+.stages button:focus-visible { outline-offset: -3px; }
+.drawing { display: block; width: 100%; height: auto; }
+.drawing text { font-family: var(--mono); font-size: 12.5px; fill: var(--scribe); }
+.drawing text.hot { fill: var(--flag); }
+.drawing text.small { font-size: 11px; fill: var(--scribe-dim); }
+.drawing-sec { display: none; }
+@media (max-width: 640px) {
+  .drawing-sec { display: block; width: 76%; margin-inline: auto; }
+  .frame { display: none; }
+}
+.drawing.off { display: none !important; }
+.flange3d { position: relative; background: #fff; }
+.flange3d canvas { display: block; width: 100%; aspect-ratio: 640 / 430; touch-action: none; cursor: grab; }
+.flange-msg { position: absolute; left: .75rem; bottom: .5rem; font-size: .875rem; color: var(--muted); }
+.readout .inline-link { color: var(--accent); }
+.geo { fill: none; stroke: #12161F; stroke-width: 1.5; }
+.thin { fill: none; stroke: var(--scribe-dim); stroke-width: .75; }
+.center { fill: none; stroke: var(--scribe-dim); stroke-width: .75; stroke-dasharray: 14 3 2 3; }
+.hotline { fill: none; stroke: var(--flag); stroke-width: 1; }
+.readout { display: grid; gap: 1rem; padding: 1rem 1.1rem 1.15rem; border-top: 1px solid #C6CCD6; min-height: 9.5rem; }
+.readout > * { min-width: 0; }
+@media (min-width: 640px) { .readout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.5rem; } }
+.readout h2 { font: 600 1.125rem/1.25 var(--display); }
+.readout p { margin-top: .35rem; font-size: .9375rem; line-height: 1.5; color: var(--scribe); }
+.readout dl, .readout table { font: 400 .875rem/1.5 var(--mono); color: var(--scribe); }
+.readout dl div { display: flex; justify-content: space-between; gap: 1rem; border-bottom: 1px solid #C6CCD6; padding-block: .22rem; }
+.readout dt { color: var(--scribe-dim); white-space: nowrap; }
+.readout dd { text-align: right; }
+.readout table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.readout th, .readout td { padding: .22rem .4rem .22rem 0; text-align: left; border-bottom: 1px solid #C6CCD6; font-weight: 400; }
+.readout th { color: var(--scribe-dim); }
+.pass { color: var(--ok); }
+.readout .sample { margin-top: .4rem; font: 400 .8125rem/1.4 var(--mono); color: var(--scribe-dim); }
+
+/* Page sections */
+.band { padding-block: clamp(3rem, 7vw, 5.5rem); border-bottom: 1px solid var(--rule); }
+.sect-head { display: grid; gap: .75rem; margin-bottom: 2.25rem; }
+.sect-head > * { min-width: 0; }
+@media (min-width: 900px) { .sect-head { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 3rem; align-items: end; } }
+.sect-head h2 { font: 700 clamp(2rem, 3.8vw, 3rem)/1.05 var(--display); text-wrap: balance; }
+.sect-head p { color: var(--muted); max-width: 40rem; }
+
+/* Services data sheet */
+.svc { border-top: 2px solid var(--ink); }
+.svc li { display: grid; gap: .6rem 2.5rem; padding-block: 1.5rem; border-bottom: 1px solid var(--rule); }
+.svc li > * { min-width: 0; }
+@media (min-width: 900px) { .svc li { grid-template-columns: minmax(0, 3.5fr) minmax(0, 5fr) minmax(0, 3.5fr); } }
+.svc h3 { font: 600 1.375rem/1.2 var(--display); }
+.svc p { color: var(--muted); max-width: 38rem; }
+.svc .gets { font: 400 .9375rem/1.55 var(--mono); }
+.svc h3 a { color: inherit; }
+.svc h3 a:hover { color: var(--accent); }
+.svc .gets b { display: block; font-weight: 500; color: var(--callout); margin-bottom: .1rem; }
+
+/* Process */
+.steps { display: grid; gap: 0; counter-reset: step; }
+@media (min-width: 640px) { .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1000px) { .steps { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+.steps li { counter-increment: step; position: relative; padding: 2.4rem 1.25rem 1.5rem 0; border-top: 2px solid var(--accent); min-width: 0; }
+.steps li::before {
+  content: counter(step); position: absolute; top: -.85rem; left: 0; width: 1.6rem; height: 1.6rem;
+  display: grid; place-items: center; background: var(--accent); color: var(--bg);
+  font: 500 .9375rem/1 var(--mono); border-radius: 50%;
+}
+.steps h3 { font: 600 1.125rem/1.2 var(--display); }
+.steps p { margin-top: .45rem; color: var(--muted); font-size: .9375rem; line-height: 1.5; }
+.steps .gate { display: block; margin-top: .7rem; font: 400 .875rem/1.4 var(--mono); color: var(--callout); }
+
+/* Tolerance guide */
+.tol-panel { background: var(--surface); border: 1px solid var(--rule); padding: clamp(1rem, 2.5vw, 2rem); }
+.tol-control { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1.5rem; margin-bottom: 1.5rem; }
+.tol-control label { font-weight: 600; }
+.tol-control input { flex: 1 1 14rem; min-width: 0; accent-color: var(--accent); height: 1.75rem; }
+.tol-control output { font: 500 1.5rem/1 var(--mono); color: var(--accent); min-width: 7.5rem; text-align: right; }
+.tol-row { display: grid; gap: .2rem 1.25rem; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "name state" "track track" "meta meta"; padding-block: .7rem; border-top: 1px solid var(--rule); align-items: center; }
+.tol-row.is-off .tol-name { color: var(--off); }
+.tol-axis-row { display: grid; grid-template-columns: minmax(0, 1fr); padding-bottom: 1.5rem; }
+@media (min-width: 860px) {
+  .tol-row { grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) 11rem; grid-template-areas: "name track state" "meta track state"; padding-block: .45rem; }
+  .tol-axis-row { grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) 11rem; column-gap: 1.25rem; }
+  .tol-axis { grid-column: 2; }
+}
+.tol-name { grid-area: name; font-weight: 500; line-height: 1.3; }
+.tol-meta { grid-area: meta; font: 400 .875rem/1.4 var(--mono); color: var(--muted); }
+.tol-state { grid-area: state; font: 500 .875rem/1.3 var(--mono); display: inline-flex; align-items: center; gap: .4rem; justify-self: end; text-align: right; }
+@media (min-width: 860px) { .tol-state { justify-self: start; text-align: left; } }
+.tol-state i { width: .6rem; height: .6rem; flex: none; border: 1.5px solid currentColor; }
+.st-std { color: var(--ok); } .st-std i { background: currentColor; }
+.st-tight { color: var(--warn); } .st-tight i { background: linear-gradient(135deg, currentColor 50%, transparent 50%); }
+.st-off { color: var(--off); }
+.tol-track { grid-area: track; position: relative; height: 1.5rem; background-image: linear-gradient(90deg, var(--rule) 1px, transparent 1px); background-size: 25% 100%; border-right: 1px solid var(--rule); }
+.tol-bar { position: absolute; top: .375rem; height: .75rem; background: var(--bar); border-radius: 1px; }
+.is-off .tol-bar { background: var(--off); opacity: .5; }
+.tol-mark { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--callout); z-index: 1; }
+@media (min-width: 860px) { .tol-mark { top: -.75rem; bottom: -.75rem; } }
+.tol-axis { position: relative; height: 1.1rem; font: 400 .8125rem/1 var(--mono); color: var(--muted); }
+.tol-axis span { position: absolute; top: .2rem; transform: translateX(-50%); white-space: nowrap; }
+.tol-axis span:first-child { transform: none; }
+.tol-axis span:last-child { transform: translateX(-100%); }
+.tol-action { margin-top: 1.25rem; }
+.tol-note { margin-top: 1.25rem; color: var(--muted); font-size: .9375rem; max-width: 46rem; }
+
+/* Materials */
+.table-scroll { overflow-x: auto; border-top: 2px solid var(--ink); }
+.mat { width: 100%; min-width: 44rem; border-collapse: collapse; }
+.mat th, .mat td { text-align: left; padding: .8rem 1.25rem .8rem 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.mat thead th { font: 500 .875rem/1.3 var(--mono); color: var(--muted); }
+.mat tbody th { font-weight: 600; white-space: nowrap; }
+.mat td { color: var(--muted); }
+.mat .num { font: 400 1rem/1.5 var(--mono); font-variant-numeric: tabular-nums; color: var(--ink); white-space: nowrap; }
+.stds { display: flex; flex-wrap: wrap; gap: .5rem 2rem; margin-top: 2.25rem; }
+.stds li { font-size: .9375rem; color: var(--muted); }
+.stds b { display: block; font: 500 1rem/1.4 var(--mono); color: var(--ink); }
+
+/* Quote */
+.quote-grid { display: grid; gap: 2.5rem; }
+.quote-grid > * { min-width: 0; }
+@media (min-width: 960px) { .quote-grid { grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: 4rem; } }
+.quote-grid h2 { font: 700 clamp(2rem, 3.8vw, 3rem)/1.05 var(--display); text-wrap: balance; }
+.quote-grid .lead { margin-top: 1rem; color: var(--muted); }
+.checklist { margin-top: 1.5rem; display: grid; gap: .5rem; }
+.checklist li { padding-left: 1.4rem; position: relative; font-size: .9375rem; }
+.checklist li::before { content: ""; position: absolute; left: 0; top: .5em; width: .65rem; height: .65rem; border: 1.5px solid var(--accent); }
+form.rfq { display: grid; gap: 1.1rem 1.25rem; background: var(--surface); border: 1px solid var(--rule); padding: clamp(1rem, 2.5vw, 2rem); }
+@media (min-width: 600px) { form.rfq { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.field { display: grid; gap: .35rem; min-width: 0; }
+.field.full { grid-column: 1 / -1; }
+.field label { font-weight: 500; font-size: .9375rem; }
+.field input, .field select, .field textarea {
+  width: 100%; min-width: 0; padding: .65rem .7rem; font: 400 1rem/1.4 var(--body); color: var(--ink);
+  background: var(--bg); border: 1px solid var(--muted); border-radius: 2px;
+}
+.field textarea { min-height: 7.5rem; resize: vertical; }
+.form-foot { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1.25rem; }
+.btn-solid { background: var(--accent); color: var(--bg); }
+.btn-solid:hover { filter: brightness(1.12); }
+.btn-ghost { background: transparent; border-color: var(--muted); color: var(--ink); }
+.form-note { font-size: .875rem; color: var(--muted); flex: 1 1 15rem; }
+.result { grid-column: 1 / -1; display: grid; gap: .75rem; border-top: 1px solid var(--rule); padding-top: 1.1rem; }
+.result pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 400 .9375rem/1.55 var(--mono); background: var(--bg); padding: .85rem; border: 1px solid var(--rule); }
+.result p { font-size: .9375rem; }
+
+/* Title block footer */
+.footer { padding-block: 2.5rem; }
+.titleblock { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 2px solid var(--ink); }
+@media (min-width: 800px) { .titleblock { grid-template-columns: minmax(0, 3fr) repeat(4, minmax(0, 1fr)); } }
+.titleblock div { padding: .6rem .75rem; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); min-width: 0; }
+.titleblock .name { grid-column: 1 / -1; }
+@media (min-width: 800px) { .titleblock .name { grid-column: auto; grid-row: span 2; border-right: 1px solid var(--rule); } }
+.titleblock span { display: block; font: 400 .8125rem/1.3 var(--mono); color: var(--muted); }
+.titleblock b { font: 500 1rem/1.4 var(--mono); overflow-wrap: anywhere; }
+.titleblock .name b { font: 700 1.375rem/1.2 var(--display); }
+.titleblock .name p { margin-top: .2rem; font-size: .9375rem; color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+/* Arabic, right to left. Drawings, scales and numbers keep reading left to right. */
+body { line-height: 1.75; }
+h1, h2, h3, .btn, .topnav a { letter-spacing: 0 !important; }
+.drawing, .flange3d, .tol-track, .tol-axis, .tol-axis-row .tol-axis, .titleblock b, .mat .num, .readout dd, .readout td { direction: ltr; unicode-bidi: isolate; }
+.readout dd { text-align: left; }
+.mat th, .mat td { text-align: right; padding: .8rem 0 .8rem 1.25rem; }
+.checklist li { padding-left: 0; padding-right: 1.4rem; }
+.checklist li::before { left: auto; right: 0; }
+.steps li { padding: 2.4rem 0 1.5rem 1.25rem; }
+.steps li::before { left: auto; right: 0; }
+.skip { left: auto; right: 16px; top: 0; transform: translateY(-200%); }
+.skip:focus { left: auto; right: 16px; transform: none; top: 8px; }
+.tol-control output { text-align: left; direction: ltr; }
+#tol-range { direction: ltr; }
+.lang-note { font-size: .9375rem; color: var(--muted); }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">انتقل إلى المحتوى</a>
+
+<div class="plate">
+  <header class="wrap topbar">
+    <a class="brand" href="#main" aria-label="الصفحة الرئيسية لـ MDM">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="15" fill="none" stroke="#12161F" stroke-width="1.5"/><circle cx="17" cy="17" r="5.5" fill="none" stroke="#B5420A" stroke-width="1.5"/><path d="M17 0v34M0 17h34" stroke="#535D70" stroke-width=".75" stroke-dasharray="6 2 1 2"/></svg>
+      <b>MDM</b>
+      <span>التصميم والتصنيع<br>الميكانيكي</span>
+    </a>
+    <nav class="topnav" aria-label="القائمة الرئيسية">
+      <a href="#services">الخدمات</a>
+      <a href="#apps">التطبيقات</a>
+      <a href="#process">مراحل العمل</a>
+      <a href="#tolerances">دليل التفاوتات</a>
+      <a href="#materials">المواد</a>
+      <a href="#quote">اطلب عرض سعر</a>
+      <a href="../" lang="en" hreflang="en">English</a>
+    </nav>
+  </header>
+
+  <main id="main" class="wrap hero">
+    <div>
+      <h1>من الرسم الأولي إلى القطعة المقاسة.</h1>
+      <p>تصمّم MDM المكوّنات والتجميعات الميكانيكية، وتتحقق منها بالتحليل، وتتابعها خلال التصنيع والفحص. يبقى الهدف التصميمي سليماً من نموذج CAD حتى القطعة النهائية.</p>
+      <div class="actions">
+        <a class="btn btn-flag" href="#quote">اطلب عرض سعر</a>
+        <a class="btn btn-line" href="#services">تعرّف على خدماتنا</a>
+      </div>
+    </div>
+
+    <figure class="sheet" aria-label="شفة واحدة معروضة عبر مراحلها الهندسية">
+      <div class="stages" role="tablist" aria-label="مرحلة المشروع">
+        <button type="button" role="tab" id="tab-design" aria-controls="readout" aria-selected="true" data-stage="design">التصميم</button>
+        <button type="button" role="tab" id="tab-simulate" aria-controls="readout" aria-selected="false" tabindex="-1" data-stage="simulate">التحليل</button>
+        <button type="button" role="tab" id="tab-machine" aria-controls="readout" aria-selected="false" tabindex="-1" data-stage="machine">التشغيل</button>
+        <button type="button" role="tab" id="tab-inspect" aria-controls="readout" aria-selected="false" tabindex="-1" data-stage="inspect">الفحص</button>
+        <button type="button" role="tab" id="tab-3d" aria-controls="readout" aria-selected="false" tabindex="-1" data-stage="view3d">3D</button>
+      </div>
+
+      <svg class="drawing" viewBox="0 0 640 430" role="img" aria-label="رسم هندسي لشفة بمنظر أمامي ومقطع A-A">
+        <defs>
+          <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#535D70" stroke-width=".8"/></pattern>
+          <marker id="arr" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="9" markerHeight="5.5" orient="auto-start-reverse"><path d="M0 0L10 3L0 6z" fill="#535D70"/></marker>
+          <marker id="arr-hot" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="9" markerHeight="5.5" orient="auto-start-reverse"><path d="M0 0L10 3L0 6z" fill="#B5420A"/></marker>
+          <radialGradient id="stress" gradientUnits="userSpaceOnUse" cx="190" cy="225" r="96">
+            <stop offset=".33" stop-color="#F7C948"/><stop offset=".5" stop-color="#E5484D"/><stop offset=".62" stop-color="#F7C948"/><stop offset=".76" stop-color="#3FB68B"/><stop offset="1" stop-color="#2F6FE0"/>
+          </radialGradient>
+          <linearGradient id="stress-h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3FB68B"/><stop offset=".4" stop-color="#E5484D"/><stop offset=".62" stop-color="#F7C948"/><stop offset="1" stop-color="#2F6FE0"/></linearGradient>
+          <linearGradient id="legend" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#2F6FE0"/><stop offset=".35" stop-color="#3FB68B"/><stop offset=".7" stop-color="#F7C948"/><stop offset="1" stop-color="#E5484D"/></linearGradient>
+        </defs>
+
+        <rect class="frame" x="6" y="6" width="628" height="418" fill="none" stroke="#C6CCD6"/>
+
+        <!-- Under-layers for each stage -->
+        <g data-layer="simulate" class="overlay" hidden>
+          <circle cx="190" cy="225" r="96" fill="url(#stress)"/>
+          <path fill="url(#stress-h)" d="M420 193H492V177H448.8V161.8H420zM420 144.2H448.8V129H420zM420 257H492V273H448.8V288.2H420zM420 305.8H448.8V321H420z"/>
+        </g>
+
+        <!-- Section hatching -->
+        <g data-layer="hatch">
+          <path fill="url(#hatch)" d="M420 193H492V177H448.8V161.8H420zM420 144.2H448.8V129H420zM420 257H492V273H448.8V288.2H420zM420 305.8H448.8V321H420z"/>
+        </g>
+
+        <!-- Part geometry at 1.6 px per mm -->
+        <g>
+          <circle class="geo scribe" pathLength="1" cx="190" cy="225" r="96"/>
+          <circle class="geo scribe" pathLength="1" cx="190" cy="225" r="48" style="animation-delay:.1s"/>
+          <circle class="geo scribe" pathLength="1" cx="190" cy="225" r="32" fill="#FFFFFF" style="fill:#FFFFFF;animation-delay:.2s"/>
+          <circle class="center" cx="190" cy="225" r="72"/>
+          <g style="fill:#FFFFFF">
+            <circle class="geo scribe" pathLength="1" style="fill:#FFFFFF;animation-delay:.3s" cx="190" cy="153" r="8.8"/>
+            <circle class="geo scribe" pathLength="1" style="fill:#FFFFFF;animation-delay:.35s" cx="252.35" cy="189" r="8.8"/>
+            <circle class="geo scribe" pathLength="1" style="fill:#FFFFFF;animation-delay:.4s" cx="252.35" cy="261" r="8.8"/>
+            <circle class="geo scribe" pathLength="1" style="fill:#FFFFFF;animation-delay:.45s" cx="190" cy="297" r="8.8"/>
+            <circle class="geo scribe" pathLength="1" style="fill:#FFFFFF;animation-delay:.5s" cx="127.65" cy="261" r="8.8"/>
+            <circle class="geo scribe" pathLength="1" style="fill:#FFFFFF;animation-delay:.55s" cx="127.65" cy="189" r="8.8"/>
+          </g>
+          <path class="center" d="M82 225H298"/>
+          <path class="center" d="M190 112V338"/>
+          <path class="geo" d="M186 112H194M186 338H194" style="stroke-width:2.5"/>
+          <path class="thin" marker-end="url(#arr)" d="M194 110H212"/>
+          <path class="thin" marker-end="url(#arr)" d="M194 340H212"/>
+          <text x="216" y="114" style="font-weight:500">A</text>
+          <text x="216" y="344" style="font-weight:500">A</text>
+
+          <path class="geo scribe" pathLength="1" d="M420 129H448.8V177H492V273H448.8V321H420Z" style="animation-delay:.25s"/>
+          <path class="geo" d="M420 193H492M420 257H492"/>
+          <path class="geo" d="M420 144.2H448.8M420 161.8H448.8M420 288.2H448.8M420 305.8H448.8"/>
+          <path class="center" d="M408 225H504"/>
+          <path class="center" d="M410 153H459M410 297H459"/>
+          <text x="438" y="350">SECTION A-A</text>
+        </g>
+
+        <!-- Design: dimensions and GD&T -->
+        <g data-layer="design" class="overlay">
+          <path class="thin" d="M94 232V384M286 232V384"/>
+          <path class="thin" marker-start="url(#arr)" marker-end="url(#arr)" d="M94 378H286"/>
+          <text x="174" y="373">Ø120</text>
+
+          <path class="thin" d="M240.9 174.1L282 102H340"/>
+          <text x="286" y="97">Ø90 PCD</text>
+
+          <path class="thin" marker-start="url(#arr)" d="M120 184.6L72 106H16"/>
+          <text x="18" y="100">6 × Ø11 THRU</text>
+          <g transform="translate(16 110)">
+            <rect class="hotline" width="102" height="19"/>
+            <path class="hotline" d="M22 0V19M78 0V19"/>
+            <circle class="hotline" cx="11" cy="9.5" r="5"/><path class="hotline" d="M11 2V17M4 9.5H18"/>
+            <text class="hot" x="27" y="13.5">Ø0.1</text>
+            <text class="hot" x="86" y="13.5">A</text>
+          </g>
+
+          <path class="thin" d="M420 124V54M448.8 124V84M492 172V54"/>
+          <path class="thin" marker-start="url(#arr)" marker-end="url(#arr)" d="M420 88H448.8"/>
+          <text x="427" y="82">18</text>
+          <path class="thin" marker-start="url(#arr)" marker-end="url(#arr)" d="M420 60H492"/>
+          <text x="449" y="54">45</text>
+
+          <path class="thin" d="M497 193H538M497 257H538"/>
+          <path class="hotline" marker-start="url(#arr-hot)" marker-end="url(#arr-hot)" d="M532 193V257"/>
+          <text class="hot" transform="translate(527 248) rotate(-90)">Ø40 H7</text>
+          <path class="thin" d="M497 177H584M497 273H584"/>
+          <path class="thin" marker-start="url(#arr)" marker-end="url(#arr)" d="M578 177V273"/>
+          <text transform="translate(573 238) rotate(-90)">Ø60</text>
+
+          <path class="hotline" d="M420 298H393"/>
+          <path d="M420 298L411 293V303Z" fill="#B5420A"/>
+          <rect class="hotline" x="373" y="288" width="20" height="20"/>
+          <text class="hot" x="379.5" y="302">A</text>
+
+          <g transform="translate(372 364)">
+            <path class="hotline" d="M52 -43V0" transform="translate(0 0)"/>
+            <rect class="hotline" width="82" height="19" y="0"/>
+            <path class="hotline" d="M22 0V19"/>
+            <path class="hotline" d="M5 13L8 6H18L15 13Z"/>
+            <text class="hot" x="30" y="13.5">0.02</text>
+          </g>
+          <text class="small" x="504" y="378">Ra 1.6 at bore</text>
+          <text class="small" x="504" y="393">ISO 2768-mK</text>
+          <text class="small" x="18" y="412">6061-T6. Dimensions in mm.</text>
+        </g>
+
+        <!-- Analyse: legend and peak -->
+        <g data-layer="simulate" class="overlay" hidden>
+          <rect x="566" y="129" width="14" height="192" fill="url(#legend)" stroke="#535D70" stroke-width=".5"/>
+          <text x="586" y="133">180</text>
+          <text x="586" y="197">120</text>
+          <text x="586" y="261">60</text>
+          <text x="586" y="325">0 MPa</text>
+          <path class="hotline" marker-end="url(#arr-hot)" d="M528 118L451 173"/>
+          <text class="hot" x="500" y="110">Peak at hub root</text>
+          <text class="small" x="18" y="412">Illustrative plot. von Mises stress.</text>
+        </g>
+
+        <!-- Machine: toolpath -->
+        <g data-layer="machine" class="overlay" hidden>
+          <g class="hotline" style="stroke-dasharray:4 3">
+            <circle cx="190" cy="225" r="88"/><circle cx="190" cy="225" r="77"/><circle cx="190" cy="225" r="66"/><circle cx="190" cy="225" r="55"/><circle cx="190" cy="225" r="42"/>
+          </g>
+          <path class="hotline" d="M190 145V161M182 153H198M252.35 181V197M244.35 189H260.35M252.35 253V269M244.35 261H260.35M190 289V305M182 297H198M127.65 253V269M119.65 261H135.65M127.65 181V197M119.65 189H135.65"/>
+          <circle id="tool" r="9" fill="#B5420A" fill-opacity=".35" stroke="#B5420A" cx="0" cy="0">
+            <animateMotion dur="9s" repeatCount="indefinite" path="M278 225A88 88 0 1 1 102 225A88 88 0 1 1 278 225"/>
+          </circle>
+          <rect x="416" y="125" width="80" height="200" fill="none" stroke="#B5420A" stroke-dasharray="5 3"/>
+          <text class="hot" x="416" y="116">Stock Ø125 × 50</text>
+          <text class="small" x="18" y="376">N20 G00 X-44. Y0. Z2.</text>
+          <text class="small" x="18" y="392">N30 G02 X-44. Y0. I44. J0. F600</text>
+          <text class="small" x="18" y="408">N40 G81 X0. Y36. Z-20. R2. F180</text>
+          <text class="small" x="438" y="370">Sample toolpath</text>
+        </g>
+
+        <!-- Inspect: probe points -->
+        <g data-layer="inspect" class="overlay" hidden>
+          <g fill="#B5420A">
+            <circle cx="222" cy="225" r="2.6"/><circle cx="212.6" cy="247.6" r="2.6"/><circle cx="190" cy="257" r="2.6"/><circle cx="167.4" cy="247.6" r="2.6"/>
+            <circle cx="158" cy="225" r="2.6"/><circle cx="167.4" cy="202.4" r="2.6"/><circle cx="190" cy="193" r="2.6"/><circle cx="212.6" cy="202.4" r="2.6"/>
+            <circle cx="190" cy="153" r="2.6"/><circle cx="252.35" cy="189" r="2.6"/><circle cx="252.35" cy="261" r="2.6"/><circle cx="190" cy="297" r="2.6"/><circle cx="127.65" cy="261" r="2.6"/><circle cx="127.65" cy="189" r="2.6"/>
+            <circle cx="420" cy="136" r="2.6"/><circle cx="420" cy="175" r="2.6"/><circle cx="420" cy="275" r="2.6"/><circle cx="420" cy="314" r="2.6"/>
+          </g>
+          <path class="hotline" d="M222 225L262 128H340"/>
+          <text class="hot" x="266" y="122">Bore, 8 points</text>
+          <path class="hotline" d="M420 175H378"/>
+          <text class="hot" x="372" y="171">Datum A</text>
+          <text class="small" x="18" y="412">Probe points shown for illustration.</text>
+        </g>
+      </svg>
+
+      <div class="flange3d" id="flange3d" hidden><canvas id="flange-canvas" aria-label="نموذج ثلاثي الأبعاد للشفة. اسحب للتدوير."></canvas><p id="flange-msg" class="flange-msg"></p></div>
+
+      <div class="readout" id="readout" role="tabpanel" aria-live="polite" aria-labelledby="tab-design">
+        <div data-panel="design">
+          <h2>ضع التفاوت الضيق حيث يهم</h2>
+          <p>تتبع المراجع طريقة تثبيت الشفة أثناء الخدمة. لا يحمل تفاوتات ضيقة إلا التجويف والوجه ونمط البراغي، مما يبقي تكلفة القطعة معقولة.</p>
+        </div>
+        <dl data-panel="design">
+          <div><dt>توافق التجويف</dt><dd>Ø40 H7 (+0.025 / 0)</dd></div>
+          <div><dt>نمط البراغي</dt><dd>Position Ø0.1 | A</dd></div>
+          <div><dt>وجه المرجع</dt><dd>Flatness 0.02</dd></div>
+          <div><dt>التفاوتات العامة</dt><dd>ISO 2768-mK</dd></div>
+        </dl>
+        <div data-panel="view3d" hidden>
+          <h2>من الرسم إلى القطعة</h2>
+          <p>هذه الشفة نفسها وبالمقاسات نفسها، كنموذج ثلاثي الأبعاد تفاعلي. اسحبها لتراها من كل الجهات.</p>
+        </div>
+        <div data-panel="view3d" hidden>
+          <dl>
+            <div><dt>المقاس الكلي</dt><dd>Ø120 × 45 mm</dd></div>
+            <div><dt>المادة</dt><dd>6061-T6</dd></div>
+          </dl>
+          <p style="margin-top:.6rem"><a class="inline-link" href="../apps/part-viewer.html">افتح عارض القطع ثلاثي الأبعاد (بالإنجليزية)</a></p>
+        </div>
+        <div data-panel="simulate" hidden>
+          <h2>اكتشف نقطة الضعف مبكراً</h2>
+          <p>يُظهر التحليل أماكن تركّز الأحمال، فيُعدَّل نصف قطر التقويس أو سُمك الجدار في نموذج CAD قبل قطع المعدن بوقت طويل.</p>
+        </div>
+        <div data-panel="simulate" hidden>
+          <dl>
+            <div><dt>أقصى إجهاد</dt><dd>168 MPa</dd></div>
+            <div><dt>حد الخضوع لـ 6061-T6</dt><dd>276 MPa</dd></div>
+            <div><dt>معامل الأمان</dt><dd>1.64</dd></div>
+          </dl>
+          <p class="sample">أرقام توضيحية وليست حالة تحميل حقيقية.</p>
+        </div>
+        <div data-panel="machine" hidden>
+          <h2>خطّط التثبيتات حول المراجع</h2>
+          <p>يُختار الخام وطريقة التثبيت وترتيب العمليات بحيث تُشغَّل الأبعاد الحرجة في تثبيت واحد، مقابل الأسطح التي يُقاس منها الرسم.</p>
+        </div>
+        <dl data-panel="machine" hidden>
+          <div><dt>العملية 10</dt><dd style="direction:rtl">خراطة وجه المرجع A وتخشين القطر الخارجي</dd></div>
+          <div><dt>العملية 20</dt><dd style="direction:rtl">قلب القطعة وخراطة الصرة وتسوية الطول</dd></div>
+          <div><dt>العملية 30</dt><dd style="direction:rtl">تجويف Ø40 H7 بمشوار تشطيب</dd></div>
+          <div><dt>العملية 40</dt><dd style="direction:rtl">ثقب 6 × Ø11 على دائرة Ø90</dd></div>
+        </dl>
+        <div data-panel="inspect" hidden>
+          <h2>قِس مقابل الرسم</h2>
+          <p>يُفحص كل بُعد حرج ويُسجَّل، فيرتبط التقرير مباشرة بالرسم الذي حدّده.</p>
+        </div>
+        <div data-panel="inspect" hidden>
+          <table>
+            <thead><tr><th scope="col">الخاصية</th><th scope="col">الحد</th><th scope="col">المقاس</th><th scope="col">النتيجة</th></tr></thead>
+            <tbody>
+              <tr><td>Ø40 H7</td><td>+0.025/0</td><td>+0.012</td><td class="pass">مطابق</td></tr>
+              <tr><td>الموضع</td><td>Ø0.100</td><td>Ø0.041</td><td class="pass">مطابق</td></tr>
+              <tr><td>الاستواء</td><td>0.020</td><td>0.009</td><td class="pass">مطابق</td></tr>
+            </tbody>
+          </table>
+          <p class="sample">بيانات توضيحية.</p>
+        </div>
+      </div>
+    </figure>
+  </main>
+</div>
+
+<section class="band" id="services">
+  <div class="wrap">
+    <div class="sect-head">
+      <h2>خدمات هندسية متكاملة</h2>
+      <p>أحضر لنا رسماً أولياً أو قطعة مستهلكة أو رسماً معتمداً. كل خدمة قائمة بذاتها، وتتشارك جميعها البيانات نفسها عندما تحتاج إلى المسار الكامل.</p>
+    </div>
+    <ul class="svc">
+      <li>
+        <h3>التصميم الميكانيكي</h3>
+        <p>قطع وتجميعات وآلات تنتقل من المتطلبات إلى المفهوم، ثم نموذج CAD ثلاثي الأبعاد مفصّل والإصدار، مع مراعاة التصنيع والتجميع منذ البداية.</p>
+        <div class="gets"><b>تستلم</b>ملفات CAD الأصلية وملفات STEP، ورسومات ثنائية الأبعاد مع GD&amp;T، وقائمة المواد</div>
+      </li>
+      <li>
+        <h3>التحليل الهندسي</h3>
+        <p>تحليل إنشائي وحراري بالعناصر المحدودة، وفحوص الكلال، وتراكم التفاوتات، للإجابة عن أسئلة محددة: هل ستتحمل القطعة؟ هل ستركب؟ وأين يمكن تخفيف الوزن أو التكلفة؟</p>
+        <div class="gets"><b>تستلم</b>تقرير حسابات يتضمن حالات التحميل والافتراضات والتعديلات الموصى بها</div>
+      </li>
+      <li>
+        <h3>الهندسة العكسية</h3>
+        <p>إعادة بناء القطع القديمة أو غير الموثقة من عينات فعلية بالقياس والمسح ثلاثي الأبعاد، ثم تصحيح أثر التآكل في النموذج لتركب القطعة البديلة كما صُممت.</p>
+        <div class="gets"><b>تستلم</b>نموذج بارامتري نظيف ورسم جاهز للتصنيع</div>
+      </li>
+      <li>
+        <h3>النماذج الأولية</h3>
+        <p>اختبر الشكل والتركيب والوظيفة بسرعة بالطباعة ثلاثية الأبعاد أو بقطع مشغّلة مفردة أو بقوالب مؤقتة، ثم أعد ما تتعلمه إلى التصميم قبل الالتزام بالإنتاج.</p>
+        <div class="gets"><b>تستلم</b>نماذج أولية فعلية وقائمة بتعديلات التصميم</div>
+      </li>
+      <li>
+        <h3>التصنيع</h3>
+        <p>تشغيل CNC والصاج واللحام والسباكة، من القطع المفردة إلى دفعات الإنتاج، مع اختيار العملية بما يناسب الكمية والمادة والتفاوت.</p>
+        <div class="gets"><b>تستلم</b>قطع أو تجميعات جاهزة، مع مسار العمليات عند الطلب</div>
+      </li>
+      <li>
+        <h3>الفحص والتوثيق</h3>
+        <p>فحص الأبعاد مقابل الرسم المعتمد، وتقارير فحص القطعة الأولى وسجلات المواد، ليكون لكل بُعد حرج دليل يثبته.</p>
+        <div class="gets"><b>تستلم</b>تقرير الفحص وشهادات المواد عند توفرها</div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="band" id="apps">
+  <div class="wrap">
+    <div class="sect-head">
+      <h2>تطبيقات هندسية يمكنك استخدامها الآن</h2>
+      <p>أدوات مجانية تعمل في متصفحك دون تثبيت. <a href="../apps/">اطّلع على التطبيقات الثمانية</a>، ومنها حاسبة دائرة البراغي وجدول اللوالب.</p>
+      <p class="lang-note">التطبيقات متاحة حالياً باللغة الإنجليزية فقط.</p>
+    </div>
+    <ul class="svc">
+      <li>
+        <h3><a href="../apps/machining-simulator.html">محاكاة التشغيل ثلاثية الأبعاد</a></h3>
+        <p>شاهد برنامج تفريز ثلاثي المحاور وهو يقطع كتلة معدنية. شغّل مثالاً جاهزاً أو الصق برنامج G-code الخاص بك، ثم راجع زمن الدورة وكمية المعدن المزال والتصادمات أثناء الحركة السريعة.</p>
+        <div class="gets"><a class="btn btn-solid" href="../apps/machining-simulator.html">افتح التطبيق</a></div>
+      </li>
+      <li>
+        <h3><a href="../apps/part-viewer.html">عارض القطع ثلاثي الأبعاد</a></h3>
+        <p>دوّر أياً من إحدى عشرة قطعة بالأبعاد الثلاثية، من دافعة المضخة إلى كوع الأنابيب. غيّر مقاساتها، واعرض مقطعاً، واقرأ كتلتها، ونزّل ملف STL.</p>
+        <div class="gets"><a class="btn btn-solid" href="../apps/part-viewer.html">افتح التطبيق</a></div>
+      </li>
+      <li>
+        <h3><a href="../apps/parts-library.html">مكتبة القطع ثلاثية الأبعاد</a></h3>
+        <p>شاهد جميع القطع بنظرة واحدة، ثم افتح أياً منها لتعديلها في العارض ثلاثي الأبعاد.</p>
+        <div class="gets"><a class="btn btn-solid" href="../apps/parts-library.html">افتح التطبيق</a></div>
+      </li>
+      <li>
+        <h3><a href="../apps/fits-calculator.html">حاسبة التوافقات</a></h3>
+        <p>حدود الثقب والعمود والخلوص والتداخل لتوافقات ISO 286 الشائعة.</p>
+        <div class="gets"><a class="btn btn-solid" href="../apps/fits-calculator.html">افتح التطبيق</a></div>
+      </li>
+      <li>
+        <h3><a href="../apps/cutting-data.html">حاسبة بيانات القطع</a></h3>
+        <p>احسب سرعة عمود الدوران ومعدل التغذية ومعدل إزالة المعدن وقدرة القطع، مع قيم بداية للمواد الشائعة.</p>
+        <div class="gets"><a class="btn btn-solid" href="../apps/cutting-data.html">افتح التطبيق</a></div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="band" id="process">
+  <div class="wrap">
+    <div class="sect-head">
+      <h2>ست مراحل، لكل منها نقطة اعتماد واضحة</h2>
+      <p>ترى العمل وتعتمده عند كل نقطة. وإذا تغيّر أحد المتطلبات، يُعدَّل في البيانات ويُنقل إلى كل المستندات اللاحقة.</p>
+    </div>
+    <ol class="steps">
+      <li><h3>المتطلبات</h3><p>نوثّق الوظيفة والأحمال وبيئة التشغيل والكمية والميزانية والموعد المستهدف.</p><span class="gate">نقطة الاعتماد: متطلبات متفق عليها</span></li>
+      <li><h3>المفهوم</h3><p>تُقارن التخطيطات والخيارات من حيث الوظيفة والتكلفة وقابلية التصنيع.</p><span class="gate">نقطة الاعتماد: المفهوم المختار</span></li>
+      <li><h3>التصميم التفصيلي</h3><p>نموذج CAD كامل وتحليل ومراجعة قابلية التصنيع وتراكم التفاوتات.</p><span class="gate">نقطة الاعتماد: مراجعة التصميم</span></li>
+      <li><h3>الإصدار</h3><p>إصدار الرسومات وقائمة المواد وضبط المراجعات.</p><span class="gate">نقطة الاعتماد: توقيع المراجعة A</span></li>
+      <li><h3>النموذج الأولي</h3><p>تُختبر القطعة الأولى من حيث التركيب والوظيفة، وتُحدِّث نتائجُها التصميم.</p><span class="gate">نقطة الاعتماد: قبول القطعة الأولى</span></li>
+      <li><h3>الإنتاج</h3><p>تُصنَّع القطع وتُفحص مقابل الرسم وتوثَّق وتُسلَّم.</p><span class="gate">نقطة الاعتماد: تقرير الفحص</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="band" id="tolerances">
+  <div class="wrap">
+    <div class="sect-head">
+      <h2>ما التفاوت الذي تحتاجه فعلاً؟</h2>
+      <p>التفاوت الأضيق ليس الأفضل دائماً، فكل خطوة نحو الأضيق قد تضيف عملية أو قطعاً أبطأ أو فحصاً أكثر. حرّك المؤشر لترى العمليات القادرة على تحقيق الرقم المطلوب.</p>
+    </div>
+    <div class="tol-panel">
+      <div class="tol-control">
+        <label for="tol-range">التفاوت المطلوب</label>
+        <input type="range" id="tol-range" min="0" max="7" step="1" value="3" aria-describedby="tol-note">
+        <output id="tol-out" for="tol-range">±0.05 mm</output>
+      </div>
+      <div class="tol-axis-row">
+        <div class="tol-axis" aria-hidden="true" id="tol-axis"></div>
+      </div>
+      <div id="tol-rows"></div>
+      <p class="tol-note" id="tol-note">تمتد الأشرطة من أضيق تفاوت عملي إلى الممارسة المعتادة في الورش، على مقياس لوغاريتمي بالمليمتر (±). هذا دليل عام للأبعاد حتى نحو 100 مم، ويؤثر المقاس والمادة وطريقة التثبيت في هذه النطاقات، لذا نؤكد التفاوتات لكل عمل.</p>
+      <div class="tol-action"><button class="btn btn-solid" type="button" id="tol-use">استخدم ±0.05 mm في طلب عرض السعر</button></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="materials">
+  <div class="wrap">
+    <div class="sect-head">
+      <h2>مواد نستخدمها عادة</h2>
+      <p>يؤثر اختيار المادة في المتانة والوزن ومقاومة التآكل وتكلفة التشغيل. هذه نقاط بداية شائعة، ويمكننا العمل وفق مواصفاتك.</p>
+    </div>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="جدول المواد">
+      <table class="mat">
+        <thead><tr><th scope="col">المادة</th><th scope="col">الكثافة، g/cm³</th><th scope="col">مناسبة لـ</th><th scope="col">طرق التصنيع المعتادة</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">ألومنيوم 6061-T6</th><td class="num">2.70</td><td>قطع إنشائية عامة، مقاومة جيدة للتآكل</td><td>تفريز، خراطة، لحام</td></tr>
+          <tr><th scope="row">ألومنيوم 7075-T6</th><td class="num">2.81</td><td>متانة عالية مع وزن منخفض</td><td>تفريز، خراطة</td></tr>
+          <tr><th scope="row">فولاذ سبائكي 4140</th><td class="num">7.85</td><td>أعمدة وتروس وقطع معالجة حرارياً</td><td>خراطة، تجليخ</td></tr>
+          <tr><th scope="row">فولاذ مقاوم للصدأ 316L</th><td class="num">8.00</td><td>بيئات أكّالة وبحرية وصحية</td><td>تشغيل، صاج، لحام</td></tr>
+          <tr><th scope="row">حديد زهر مرن</th><td class="num">7.10</td><td>أغلفة ومقاطع سميكة، وتخميد جيد للاهتزاز</td><td>سباكة رملية، تشغيل</td></tr>
+          <tr><th scope="row">برونز المحامل</th><td class="num">8.90</td><td>جُلب وأسطح احتكاك</td><td>سباكة، خراطة</td></tr>
+          <tr><th scope="row">تيتانيوم Ti-6Al-4V</th><td class="num">4.43</td><td>نسبة عالية للمتانة إلى الوزن، ومقاومة للتآكل</td><td>تفريز، خراطة</td></tr>
+          <tr><th scope="row">أسيتال (POM)</th><td class="num">1.41</td><td>قطع بلاستيكية منخفضة الاحتكاك وثابتة الأبعاد</td><td>تشغيل، حقن</td></tr>
+          <tr><th scope="row">PEEK</th><td class="num">1.31</td><td>قطع بلاستيكية تتحمل الحرارة العالية والمواد الكيميائية</td><td>تشغيل، حقن</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="stds" aria-label="معايير الرسم والتفاوتات">
+      <li><b>ISO 1101</b>التفاوتات الهندسية</li>
+      <li><b>ASME Y14.5</b>الأبعاد والتفاوتات</li>
+      <li><b>ISO 286</b>الحدود والتوافقات</li>
+      <li><b>ISO 2768</b>التفاوتات العامة</li>
+      <li><b>ISO 8062</b>تفاوتات السباكة</li>
+    </ul>
+  </div>
+</section>
+
+<section class="band" id="quote">
+  <div class="wrap quote-grid">
+    <div>
+      <h2>أخبرنا بما تحتاج إلى تصنيعه</h2>
+      <p class="lead">يكفي رسم أولي ومشكلة واضحة للبدء، وكلما زادت التفاصيل كان عرض السعر أدق.</p>
+      <ul class="checklist">
+        <li>وظيفة القطعة وما تتصل به</li>
+        <li>الكمية الآن وعلى مدى عمر المنتج</li>
+        <li>المادة والتشطيب وبيئة التشغيل</li>
+        <li>ملفات CAD أو الرسومات إن وُجدت</li>
+        <li>الموعد الذي تحتاج فيه القطع</li>
+      </ul>
+    </div>
+    <form class="rfq" id="rfq" novalidate>
+      <div class="field"><label for="f-name">اسمك</label><input id="f-name" name="name" autocomplete="name" required></div>
+      <div class="field"><label for="f-email">البريد الإلكتروني</label><input id="f-email" name="email" type="email" autocomplete="email" required></div>
+      <div class="field"><label for="f-company">الشركة (اختياري)</label><input id="f-company" name="company" autocomplete="organization"></div>
+      <div class="field">
+        <label for="f-service">الخدمة</label>
+        <select id="f-service" name="service">
+          <option>تصميم وتصنيع</option>
+          <option>تصميم ميكانيكي فقط</option>
+          <option>تحليل هندسي</option>
+          <option>هندسة عكسية</option>
+          <option>نماذج أولية</option>
+          <option>تصنيع وفق رسوماتي</option>
+          <option>فحص</option>
+        </select>
+      </div>
+      <div class="field"><label for="f-qty">الكمية</label><input id="f-qty" name="quantity" inputmode="numeric" placeholder="مثلاً 50"></div>
+      <div class="field"><label for="f-material">المادة (إن كانت معروفة)</label><input id="f-material" name="material" placeholder="مثلاً 6061-T6"></div>
+      <div class="field full"><label for="f-tol">أضيق تفاوت (إن كان معروفاً)</label><input id="f-tol" name="tolerance" placeholder="مثلاً ±0.05 mm"></div>
+      <div class="field full"><label for="f-msg">وصف المشروع</label><textarea id="f-msg" name="message" required placeholder="ما وظيفة القطعة، وما المشكلة التي تحلّها؟"></textarea></div>
+      <div class="form-foot">
+        <button class="btn btn-solid" type="submit" id="rfq-submit">جهّز طلبي</button>
+        <p class="form-note" id="rfq-note" role="alert"></p>
+      </div>
+      <div class="result" id="rfq-result" hidden>
+        <p id="rfq-result-text"></p>
+        <pre id="rfq-summary"></pre>
+        <div><button class="btn btn-ghost" type="button" id="rfq-copy">انسخ الطلب</button></div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<footer class="wrap footer">
+  <div class="titleblock">
+    <div class="name"><b>MDM</b><p>التصميم والتصنيع الميكانيكي</p><p>web-claude.duckdns.org</p></div>
+    <div><span>المقياس</span><b>1:1</b></div>
+    <div><span>الوحدات</span><b>mm, MPa</b></div>
+    <div><span>اللوحة</span><b>1 / 1</b></div>
+    <div><span>المراجعة</span><b>A</b></div>
+    <div><span>الإسقاط</span><b style="direction:rtl">الزاوية الأولى</b></div>
+    <div><span>الإصدار</span><b>2026-11</b></div>
+    <div><span>حقوق النشر</span><b>© <span id="year" style="display:inline;font:inherit;color:inherit">2026</span> MDM</b></div>
+    <div><span>الحالة</span><b style="direction:rtl">معتمد</b></div>
+  </div>
+</footer>
+
+<script>
+/* Set this to the address that should receive quote requests. */
+const CONTACT_EMAIL = "mahmoudsobhyelagha@gmail.com";
+
+/* 3D flange: the library only loads when someone opens the 3D tab. */
+let flangeStarted = false;
+function loadScript(src, integrity) {
+  return new Promise((resolve, reject) => {
+    const el = document.createElement('script');
+    el.src = src;
+    if (integrity) { el.integrity = integrity; el.crossOrigin = 'anonymous'; }
+    el.onload = resolve;
+    el.onerror = reject;
+    document.head.append(el);
+  });
+}
+function openFlange() {
+  if (flangeStarted) return;
+  flangeStarted = true;
+  const msg = document.getElementById('flange-msg');
+  msg.textContent = 'جارٍ تحميل النموذج ثلاثي الأبعاد';
+  loadScript('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js', 'sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu')
+    .then(() => loadScript('../assets/viewer3d.js'))
+    .then(() => {
+      const view = MDM3D.createView(document.getElementById('flange-canvas'));
+      if (!view) { msg.textContent = 'هذا الجهاز لا يدعم الرسوم ثلاثية الأبعاد.'; return; }
+      const part = MDM3D.PARTS.flange;
+      const geos = part.build(Object.fromEntries(part.params.map(p => [p.key, p.val])));
+      view.scene.add(MDM3D.partGroup(geos));
+      view.resize();
+      view.frame(MDM3D.boxOf(geos));
+      msg.textContent = 'اسحب للتدوير، ومرّر أو اقرص للتكبير.';
+    })
+    .catch(() => { msg.textContent = 'تعذّر تحميل النموذج ثلاثي الأبعاد. تحقق من اتصالك وأعد تحميل الصفحة.'; });
+}
+
+/* Stage switcher */
+(function () {
+  const tabs = [...document.querySelectorAll('.stages [role="tab"]')];
+  const panel = document.getElementById('readout');
+  function show(tab, focus) {
+    const stage = tab.dataset.stage;
+    tabs.forEach(t => {
+      const on = t === tab;
+      t.setAttribute('aria-selected', on);
+      t.tabIndex = on ? 0 : -1;
+    });
+    document.querySelectorAll('[data-layer]').forEach(el => {
+      if (el.dataset.layer === 'hatch') { el.hidden = stage === 'simulate'; el.style.display = stage === 'simulate' ? 'none' : ''; return; }
+      const on = el.dataset.layer === stage;
+      el.hidden = !on;
+      el.style.display = on ? '' : 'none';
+    });
+    document.querySelectorAll('[data-panel]').forEach(el => { el.hidden = el.dataset.panel !== stage; });
+    document.querySelectorAll('.sheet .drawing').forEach(el => el.classList.toggle('off', stage === 'view3d'));
+    document.getElementById('flange3d').hidden = stage !== 'view3d';
+    if (stage === 'view3d') openFlange();
+    panel.setAttribute('aria-labelledby', tab.id);
+    if (focus) tab.focus();
+  }
+  tabs.forEach((t, i) => {
+    t.addEventListener('click', () => show(t));
+    t.addEventListener('keydown', e => {
+      const step = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+      if (!step) return;
+      e.preventDefault();
+      show(tabs[(i + step + tabs.length) % tabs.length], true);
+    });
+  });
+  const drawing = document.querySelector('.drawing');
+  const sectionView = drawing.cloneNode(true);
+  sectionView.querySelector('defs').remove();
+  sectionView.querySelector('#tool').remove();
+  sectionView.classList.add('drawing-sec');
+  sectionView.setAttribute('viewBox', '360 45 280 355');
+  sectionView.setAttribute('aria-hidden', 'true');
+  sectionView.removeAttribute('role');
+  sectionView.removeAttribute('aria-label');
+  drawing.after(sectionView);
+  const phone = matchMedia('(max-width: 640px)');
+  const fit = () => drawing.setAttribute('viewBox', phone.matches ? '0 84 368 336' : '0 0 640 430');
+  phone.addEventListener('change', fit);
+  fit();
+  show(tabs[0]);
+
+  const reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const motion = document.querySelector('#tool animateMotion');
+  if (reduced && motion) {
+    const tool = document.getElementById('tool');
+    motion.remove();
+    tool.setAttribute('cx', '278');
+    tool.setAttribute('cy', '225');
+  }
+})();
+
+/* Tolerance guide: [process, tightest practical, normal practice, surface finish, usual batch] */
+(function () {
+  const PROCESSES = [
+    ['التجليخ', 0.002, 0.02, 'Ra 0.1–0.8', '1–10,000'],
+    ['القطع بالسلك EDM', 0.003, 0.02, 'Ra 0.4–3.2', '1–500'],
+    ['الخراطة CNC', 0.01, 0.1, 'Ra 0.8–3.2', '1–10,000'],
+    ['التفريز CNC', 0.01, 0.1, 'Ra 0.8–3.2', '1–5,000'],
+    ['الحقن البلاستيكي', 0.05, 0.3, 'حسب القالب', '1,000+'],
+    ['القطع بالليزر', 0.1, 0.25, 'Ra 3.2–12.5', '1–10,000'],
+    ['السباكة الدقيقة', 0.1, 0.5, 'Ra 1.6–6.3', '50–10,000'],
+    ['طباعة البوليمرات ثلاثية الأبعاد', 0.15, 0.5, 'Ra 6.3–25', '1–500'],
+    ['ثني الصاج', 0.2, 0.75, 'حسب اللوح', '1–10,000'],
+    ['السباكة الرملية', 0.5, 3, 'Ra 6.3–25', '1–5,000'],
+  ];
+  const STOPS = [0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1];
+  const pos = v => (Math.log10(v) + 3) / 4 * 100;
+
+  document.getElementById('tol-axis').innerHTML = [0.001, 0.01, 0.1, 1, 10]
+    .map(v => `<span style="left:${pos(v)}%">±${v}</span>`).join('');
+
+  const host = document.getElementById('tol-rows');
+  host.innerHTML = PROCESSES.map(([name, best, std, ra, batch]) => `
+    <div class="tol-row" data-best="${best}" data-std="${std}">
+      <div class="tol-name">${name}</div>
+      <div class="tol-meta">±${best}–${std} · ${ra} · الكمية ${batch}</div>
+      <div class="tol-track">
+        <div class="tol-bar" style="left:${pos(best)}%;width:${pos(std) - pos(best)}%"></div>
+        <div class="tol-mark"></div>
+      </div>
+      <div class="tol-state"><i></i><span></span></div>
+    </div>`).join('');
+
+  const range = document.getElementById('tol-range');
+  const out = document.getElementById('tol-out');
+  function update() {
+    const t = STOPS[+range.value];
+    const label = `±${t} mm`;
+    out.textContent = label;
+    range.setAttribute('aria-valuetext', label);
+    document.getElementById('tol-use').textContent = `استخدم ${label} في طلب عرض السعر`;
+    host.querySelectorAll('.tol-row').forEach(row => {
+      const best = +row.dataset.best, std = +row.dataset.std;
+      const kind = t >= std ? 'std' : t >= best ? 'tight' : 'off';
+      row.classList.toggle('is-off', kind === 'off');
+      row.querySelector('.tol-mark').style.left = pos(t) + '%';
+      const state = row.querySelector('.tol-state');
+      state.className = 'tol-state st-' + kind;
+      state.querySelector('span').textContent = { std: 'ممارسة معتادة', tight: 'ممكن بتكلفة أعلى', off: 'خارج النطاق' }[kind];
+    });
+  }
+  range.addEventListener('input', update);
+  document.getElementById('tol-use').addEventListener('click', () => {
+    const field = document.getElementById('f-tol');
+    field.value = out.textContent;
+    field.scrollIntoView({ block: 'center', behavior: 'instant' });
+    field.focus({ preventScroll: true });
+  });
+  update();
+})();
+
+/* Quote form: prepares an email, because a static site has no server to send it. */
+(function () {
+  const form = document.getElementById('rfq');
+  const note = document.getElementById('rfq-note');
+  const result = document.getElementById('rfq-result');
+  const summary = document.getElementById('rfq-summary');
+  const resultText = document.getElementById('rfq-result-text');
+  const copyBtn = document.getElementById('rfq-copy');
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const bad = [...form.querySelectorAll('[required]')].find(f => !f.checkValidity());
+    form.querySelectorAll('[required]').forEach(f => f.setAttribute('aria-invalid', !f.checkValidity()));
+    if (bad) {
+      const name = form.querySelector(`label[for="${bad.id}"]`).textContent;
+      note.textContent = bad.type === 'email' && bad.value
+        ? 'أدخل عنوان بريد إلكتروني كاملاً، مثل name@company.com.'
+        : `أضف ${name} للمتابعة.`;
+      bad.focus();
+      return;
+    }
+    note.textContent = '';
+    const d = new FormData(form);
+    const subject = `طلب عرض سعر: ${d.get('service')}`;
+    const text = [
+      `الاسم: ${d.get('name')}`,
+      `البريد الإلكتروني: ${d.get('email')}`,
+      d.get('company') && `الشركة: ${d.get('company')}`,
+      `الخدمة: ${d.get('service')}`,
+      d.get('quantity') && `الكمية: ${d.get('quantity')}`,
+      d.get('material') && `المادة: ${d.get('material')}`,
+      d.get('tolerance') && `أضيق تفاوت: ${d.get('tolerance')}`,
+    ].filter(Boolean).join('\n') + '\n\n' + d.get('message');
+    summary.textContent = text;
+    result.hidden = false;
+    if (CONTACT_EMAIL) {
+      resultText.textContent = `يُفترض أن يفتح تطبيق البريد لديك وفيه هذا الطلب. إن لم يفتح، انسخ النص وأرسله إلى ${CONTACT_EMAIL}، وأرفق أي ملفات CAD أو رسومات بالرسالة.`;
+      location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
+    } else {
+      resultText.textContent = 'طلبك جاهز للنسخ، لكن الموقع لا يحتوي على عنوان تواصل بعد، لذلك لم يُرسَل.';
+    }
+    result.scrollIntoView({ block: 'nearest' });
+  });
+
+  copyBtn.addEventListener('click', () => {
+    const selectIt = () => {
+      const r = document.createRange();
+      r.selectNodeContents(summary);
+      const s = getSelection();
+      s.removeAllRanges();
+      s.addRange(r);
+      copyBtn.textContent = 'تم تحديد النص، اضغط Ctrl+C';
+    };
+    if (!navigator.clipboard) return selectIt();
+    navigator.clipboard.writeText(summary.textContent)
+      .then(() => { copyBtn.textContent = 'تم النسخ'; })
+      .catch(selectIt);
+  });
+})();
+
+document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
