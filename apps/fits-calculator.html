@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>MDM Fits Calculator</title>
+<meta name="description" content="ISO 286 hole-basis fits: limits, clearance and interference for common hole and shaft tolerances.">
+<link rel="canonical" href="https://web-claude.duckdns.org/apps/fits-calculator.html">
+<meta property="og:title" content="MDM Fits Calculator">
+<meta property="og:description" content="ISO 286 hole-basis fits: limits, clearance and interference.">
+<meta property="og:image" content="https://web-claude.duckdns.org/og-image.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%2318246E'/%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='%23fff' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='3.5' fill='%23FF9A5C'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Carlito:wght@400;700&family=Tinos:wght@400;700&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+<style>
+.zones { width: 100%; height: auto; display: block; }
+.zones text { font: 400 13px var(--body); fill: var(--muted); }
+.fit-type { font: 700 1.25rem/1.2 var(--display); }
+</style>
+</head>
+<body>
+<div class="top">
+  <header class="wrap topbar">
+    <a class="brand" href="../"><b>MDM</b><span>Mechanical Design<br>&amp; Manufacturing</span></a>
+    <nav class="topnav" aria-label="Main">
+      <a href="../">Home</a>
+      <a href="./">Apps</a>
+      <a href="fits-calculator.html" aria-current="page">Fits Calculator</a>
+      <a href="../#quote">Request a quote</a>
+    </nav>
+  </header>
+</div>
+<main class="wrap">
+  <div class="page-head">
+    <h1>Fits Calculator</h1>
+    <p>Find the limits of a hole and shaft fit, and how much clearance or interference you will get. Uses the ISO 286 hole-basis system for sizes up to 500 mm.</p>
+  </div>
+  <div class="calc">
+    <form class="panel" id="form" aria-label="Fit inputs">
+      <h2>Inputs</h2>
+      <div class="field"><label for="size">Nominal size, mm</label><input id="size" type="number" min="1" max="500" step="0.01" value="40"></div>
+      <div class="field">
+        <label for="preset">Common fit</label>
+        <select id="preset">
+          <option value="H11/d9">H11/d9 loose running</option>
+          <option value="H9/d9">H9/d9 free running</option>
+          <option value="H8/f7">H8/f7 close running</option>
+          <option value="H7/g6">H7/g6 sliding</option>
+          <option value="H7/h6" selected>H7/h6 locational clearance</option>
+          <option value="H7/k6">H7/k6 locational transition</option>
+          <option value="H7/n6">H7/n6 tight transition</option>
+          <option value="H7/p6">H7/p6 locational interference</option>
+          <option value="custom">Choose my own</option>
+        </select>
+      </div>
+      <div class="twoup">
+        <div class="field">
+          <label for="hole">Hole</label>
+          <select id="hole"><option>H6</option><option selected>H7</option><option>H8</option><option>H9</option><option>H11</option></select>
+        </div>
+        <div class="field">
+          <label for="shaft">Shaft</label>
+          <select id="shaft">
+            <option>d9</option><option>e8</option><option>f7</option><option>g6</option><option selected>h6</option><option>h7</option><option>h9</option><option>js6</option><option>k6</option><option>m6</option><option>n6</option><option>p6</option>
+          </select>
+        </div>
+      </div>
+      <p class="alert" id="problem" role="alert"></p>
+    </form>
+
+    <section class="panel" aria-label="Results" aria-live="polite">
+      <h2 id="fit-name">Results</h2>
+      <p class="fit-type" id="fit-type"></p>
+      <dl class="data">
+        <div><dt>Hole limits</dt><dd id="r-hole"></dd></div>
+        <div><dt>Hole tolerance</dt><dd id="r-hole-dev"></dd></div>
+        <div><dt>Shaft limits</dt><dd id="r-shaft"></dd></div>
+        <div><dt>Shaft tolerance</dt><dd id="r-shaft-dev"></dd></div>
+        <div><dt id="l-max">Maximum clearance</dt><dd id="r-max"></dd></div>
+        <div><dt id="l-min">Minimum clearance</dt><dd id="r-min"></dd></div>
+      </dl>
+      <svg class="zones" id="zones" viewBox="0 0 440 200" role="img" aria-label="Tolerance zones of the hole and shaft relative to the nominal size"></svg>
+      <p class="note">Values follow ISO 286 for the size ranges up to 500 mm. Check critical fits against the standard or your drawing. Positive clearance means the shaft is smaller than the hole, and negative clearance means interference.</p>
+      <div class="row"><a class="btn" href="../#quote">Request a quote</a></div>
+    </section>
+  </div>
+</main>
+<footer class="foot"><div class="wrap">Runs in your browser. Nothing you enter here is uploaded or saved.</div></footer>
+
+<script>
+(function () {
+  const $ = id => document.getElementById(id);
+  /* Upper limits of the ISO 286 size ranges in mm */
+  const RANGES = [3, 6, 10, 18, 30, 50, 80, 120, 180, 250, 315, 400, 500];
+  /* Standard tolerance grades in µm, one value per range */
+  const IT = {
+    5: [4, 5, 6, 8, 9, 11, 13, 15, 18, 20, 23, 25, 27],
+    6: [6, 8, 9, 11, 13, 16, 19, 22, 25, 29, 32, 36, 40],
+    7: [10, 12, 15, 18, 21, 25, 30, 35, 40, 46, 52, 57, 63],
+    8: [14, 18, 22, 27, 33, 39, 46, 54, 63, 72, 81, 89, 97],
+    9: [25, 30, 36, 43, 52, 62, 74, 87, 100, 115, 130, 140, 155],
+    11: [60, 75, 90, 110, 130, 160, 190, 220, 250, 290, 320, 360, 400],
+  };
+  /* Shaft fundamental deviations in µm: upper deviation for d to h, lower deviation for k to p */
+  const UPPER = {
+    d: [-20, -30, -40, -50, -65, -80, -100, -120, -145, -170, -190, -210, -230],
+    e: [-14, -20, -25, -32, -40, -50, -60, -72, -85, -100, -110, -125, -135],
+    f: [-6, -10, -13, -16, -20, -25, -30, -36, -43, -50, -56, -62, -68],
+    g: [-2, -4, -5, -6, -7, -9, -10, -12, -14, -15, -17, -18, -20],
+    h: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  };
+  const LOWER = {
+    k: [0, 1, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 5],
+    m: [2, 4, 6, 7, 8, 9, 11, 13, 15, 17, 20, 21, 23],
+    n: [4, 8, 10, 12, 15, 17, 20, 23, 27, 31, 34, 37, 40],
+    p: [6, 12, 15, 18, 22, 26, 32, 37, 43, 50, 56, 62, 68],
+  };
+  const fmt = (v, d) => v.toFixed(d);
+  const um = v => `${v > 0 ? '+' : ''}${v} µm`;
+
+  function zone(spec, r) {
+    const m = spec.match(/^([a-zA-Z]+)(\d+)$/);
+    const letter = m[1], grade = +m[2];
+    const it = IT[grade][r];
+    if (letter === 'H') return [0, it];
+    if (letter === 'js') return [-it / 2, it / 2];
+    if (UPPER[letter]) return [UPPER[letter][r] - it, UPPER[letter][r]];
+    return [LOWER[letter][r], LOWER[letter][r] + it];
+  }
+  function draw(size, hole, shaft) {
+    const svg = $('zones');
+    const lo = Math.min(hole[0], shaft[0], 0), hi = Math.max(hole[1], shaft[1], 0);
+    const pad = (hi - lo) * 0.15 || 10;
+    const y = v => 20 + (hi + pad - v) / (hi - lo + 2 * pad) * 160;
+    const box = (x, z, fill, label) =>
+      `<rect x="${x}" y="${y(z[1])}" width="120" height="${Math.max(2, y(z[0]) - y(z[1]))}" fill="${fill}" fill-opacity=".25" stroke="${fill}"/>` +
+      `<text x="${x + 60}" y="${y(z[1]) - 6}" text-anchor="middle">${label}</text>`;
+    svg.innerHTML =
+      `<line x1="30" x2="430" y1="${y(0)}" y2="${y(0)}" stroke="#12161F" stroke-dasharray="6 3"/>` +
+      `<text x="30" y="${y(0) - 6}">Nominal Ø${size}</text>` +
+      box(110, hole, '#2A3CB8', `Hole ${$('hole').value}`) +
+      box(270, shaft, '#B5420A', `Shaft ${$('shaft').value}`);
+  }
+  function calc() {
+    const size = parseFloat($('size').value);
+    if (!(size > 0) || size > 500) {
+      $('problem').textContent = 'Enter a nominal size above 0 and up to 500 mm.';
+      return;
+    }
+    $('problem').textContent = '';
+    const r = RANGES.findIndex(top => size <= top);
+    const hole = zone($('hole').value, r), shaft = zone($('shaft').value, r);
+    const maxC = hole[1] - shaft[0], minC = hole[0] - shaft[1];
+    $('fit-name').textContent = `Ø${size} ${$('hole').value}/${$('shaft').value}`;
+    $('fit-type').textContent = minC >= 0 ? 'Clearance fit' : maxC <= 0 ? 'Interference fit' : 'Transition fit';
+    $('r-hole').textContent = `${fmt(size + hole[0] / 1000, 3)} to ${fmt(size + hole[1] / 1000, 3)} mm`;
+    $('r-hole-dev').textContent = `${um(hole[0])} / ${um(hole[1])}`;
+    $('r-shaft').textContent = `${fmt(size + shaft[0] / 1000, 3)} to ${fmt(size + shaft[1] / 1000, 3)} mm`;
+    $('r-shaft-dev').textContent = `${um(shaft[0])} / ${um(shaft[1])}`;
+    const lab = v => (v >= 0 ? 'clearance' : 'interference');
+    $('l-max').textContent = maxC >= 0 ? 'Maximum clearance' : 'Minimum interference';
+    $('r-max').textContent = `${fmt(Math.abs(maxC) / 1000, 3)} mm`;
+    $('l-min').textContent = minC >= 0 ? 'Minimum clearance' : 'Maximum interference';
+    $('r-min').textContent = `${fmt(Math.abs(minC) / 1000, 3)} mm`;
+    $('fit-type').title = `From ${lab(maxC)} ${Math.abs(maxC)} µm to ${lab(minC)} ${Math.abs(minC)} µm`;
+    draw(size, hole, shaft);
+  }
+  $('preset').addEventListener('change', () => {
+    const v = $('preset').value;
+    if (v !== 'custom') {
+      const [h, s] = v.split('/');
+      $('hole').value = h;
+      $('shaft').value = s;
+    }
+    calc();
+  });
+  ['hole', 'shaft'].forEach(id => $(id).addEventListener('change', () => {
+    const pair = `${$('hole').value}/${$('shaft').value}`;
+    $('preset').value = [...$('preset').options].some(o => o.value === pair) ? pair : 'custom';
+    calc();
+  }));
+  $('size').addEventListener('input', calc);
+  $('form').addEventListener('submit', e => e.preventDefault());
+  calc();
+  window.mdmFits = { zone, RANGES };
+})();
+</script>
+</body>
+</html>

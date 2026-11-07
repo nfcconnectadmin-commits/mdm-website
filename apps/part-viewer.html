@@ -186,8 +186,8 @@
       out.htmlFor = id;
       const input = document.createElement('input');
       Object.assign(input, { type: 'range', id, min: p.min, max: p.max, step: p.step, value: state.values[state.part][p.key] });
-      const unit = p.key === 'holes' || p.key === 'z' ? '' : p.key === 'm' ? '' : ' mm';
-      const show = () => { out.textContent = `${input.value}${unit}`; };
+      const unit = p.unit !== undefined ? p.unit : p.key === 'holes' || p.key === 'z' || p.key === 'm' ? '' : ' mm';
+      const show = () => { out.textContent = p.fmt ? p.fmt(parseFloat(input.value)) : `${input.value}${unit}`; };
       input.addEventListener('input', () => {
         state.values[state.part][p.key] = parseFloat(input.value);
         show();
@@ -201,6 +201,7 @@
 
   $('part').addEventListener('change', () => {
     state.part = $('part').value;
+    try { history.replaceState(null, '', `#${state.part}`); } catch (err) { /* address bar update is optional */ }
     controls();
     rebuild(true);
   });
@@ -220,8 +221,17 @@
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   });
 
+  const fromLink = location.hash.slice(1);
+  if (MDM3D.PARTS[fromLink]) {
+    state.part = fromLink;
+    $('part').value = fromLink;
+  }
   controls();
   rebuild(true);
+  window.addEventListener('hashchange', () => {
+    const k = location.hash.slice(1);
+    if (MDM3D.PARTS[k] && k !== state.part) { $('part').value = k; $('part').dispatchEvent(new Event('change')); }
+  });
   window.addEventListener('resize', () => box && view.frame(box), { once: true });
   window.mdmViewer = { getVolume: () => MDM3D.volumeOf(geometries), setPart: k => { $('part').value = k; $('part').dispatchEvent(new Event('change')); } };
 })();

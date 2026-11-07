@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>MDM Bolt Circle Calculator</title>
+<meta name="description" content="Work out the X and Y position of every hole on a bolt circle, with a scale preview and a copyable list.">
+<link rel="canonical" href="https://web-claude.duckdns.org/apps/bolt-circle.html">
+<meta property="og:title" content="MDM Bolt Circle Calculator">
+<meta property="og:description" content="X and Y positions for every hole on a bolt circle.">
+<meta property="og:image" content="https://web-claude.duckdns.org/og-image.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%2318246E'/%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='%23fff' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='3.5' fill='%23FF9A5C'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Carlito:wght@400;700&family=Tinos:wght@400;700&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+<style>
+.preview { width: 100%; max-width: 26rem; height: auto; display: block; margin-inline: auto; }
+.preview text { font: 400 12px var(--body); fill: var(--muted); }
+.holes { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.holes th, .holes td { text-align: right; padding: .35rem .5rem; border-bottom: 1px solid var(--rule); font-size: 1rem; }
+.holes th { color: var(--muted); font-weight: 400; }
+.holes th:first-child, .holes td:first-child { text-align: left; }
+.scroll { overflow-x: auto; max-height: 24rem; }
+</style>
+</head>
+<body>
+<div class="top">
+  <header class="wrap topbar">
+    <a class="brand" href="../"><b>MDM</b><span>Mechanical Design<br>&amp; Manufacturing</span></a>
+    <nav class="topnav" aria-label="Main">
+      <a href="../">Home</a>
+      <a href="./">Apps</a>
+      <a href="bolt-circle.html" aria-current="page">Bolt Circle</a>
+      <a href="../#quote">Request a quote</a>
+    </nav>
+  </header>
+</div>
+<main class="wrap">
+  <div class="page-head">
+    <h1>Bolt Circle Calculator</h1>
+    <p>Enter the bolt circle and number of holes to get the X and Y position of each hole. Angles are measured counter-clockwise from the +X axis.</p>
+  </div>
+  <div class="calc">
+    <form class="panel" id="form" aria-label="Bolt circle inputs">
+      <h2>Inputs</h2>
+      <div class="twoup">
+        <div class="field"><label for="pcd">Bolt circle diameter, mm</label><input id="pcd" type="number" min="0.1" step="0.1" value="90"></div>
+        <div class="field"><label for="n">Number of holes</label><input id="n" type="number" min="1" max="72" step="1" value="6"></div>
+        <div class="field"><label for="start">First hole angle, °</label><input id="start" type="number" step="0.5" value="90"></div>
+        <div class="field"><label for="hd">Hole diameter, mm</label><input id="hd" type="number" min="0" step="0.1" value="11"></div>
+        <div class="field"><label for="cx">Centre X, mm</label><input id="cx" type="number" step="0.1" value="0"></div>
+        <div class="field"><label for="cy">Centre Y, mm</label><input id="cy" type="number" step="0.1" value="0"></div>
+      </div>
+      <p class="alert" id="problem" role="alert"></p>
+      <svg class="preview" id="preview" viewBox="0 0 300 300" role="img" aria-label="Scale preview of the bolt circle"></svg>
+    </form>
+
+    <section class="panel" aria-label="Hole positions">
+      <h2>Hole positions</h2>
+      <dl class="data">
+        <div><dt>Angle between holes</dt><dd id="r-step"></dd></div>
+        <div><dt>Chord between neighbours</dt><dd id="r-chord"></dd></div>
+        <div><dt>Gap between hole edges</dt><dd id="r-gap"></dd></div>
+      </dl>
+      <div class="scroll"><table class="holes"><thead><tr><th scope="col">Hole</th><th scope="col">Angle °</th><th scope="col">X mm</th><th scope="col">Y mm</th></tr></thead><tbody id="rows"></tbody></table></div>
+      <div class="row">
+        <button class="btn btn-solid" type="button" id="copy">Copy positions</button>
+        <span class="note" id="copy-note" aria-live="polite"></span>
+      </div>
+    </section>
+  </div>
+</main>
+<footer class="foot"><div class="wrap">Runs in your browser. Nothing you enter here is uploaded or saved.</div></footer>
+<script>
+(function () {
+  const $ = id => document.getElementById(id);
+  const num = id => parseFloat($(id).value);
+  let text = '';
+  function calc() {
+    const pcd = num('pcd'), n = Math.round(num('n')), start = num('start') || 0, hd = num('hd') || 0, cx = num('cx') || 0, cy = num('cy') || 0;
+    if (!(pcd > 0) || !(n >= 1) || n > 72) {
+      $('problem').textContent = 'Enter a bolt circle above 0 and between 1 and 72 holes.';
+      return;
+    }
+    const step = 360 / n, chord = n > 1 ? pcd * Math.sin(Math.PI / n) : 0;
+    const gap = chord - hd;
+    $('problem').textContent = n > 1 && gap <= 0 ? 'The holes overlap. Use fewer or smaller holes, or a larger bolt circle.' : '';
+    $('r-step').textContent = `${step.toFixed(3)}°`;
+    $('r-chord').textContent = n > 1 ? `${chord.toFixed(3)} mm` : '–';
+    $('r-gap').textContent = n > 1 ? `${gap.toFixed(3)} mm` : '–';
+    const holes = [];
+    for (let i = 0; i < n; i++) {
+      const a = start + i * step, r = a * Math.PI / 180;
+      const x = cx + pcd / 2 * Math.cos(r), y = cy + pcd / 2 * Math.sin(r);
+      holes.push([i + 1, ((a % 360) + 360) % 360, Math.abs(x) < 5e-4 ? 0 : x, Math.abs(y) < 5e-4 ? 0 : y]);
+    }
+    $('rows').innerHTML = holes.map(h => `<tr><td>${h[0]}</td><td>${h[1].toFixed(2)}</td><td>${h[2].toFixed(3)}</td><td>${h[3].toFixed(3)}</td></tr>`).join('');
+    text = holes.map(h => `${h[0]}\tX${h[2].toFixed(3)}\tY${h[3].toFixed(3)}`).join('\n');
+    const scale = 120 / (pcd / 2 + hd / 2 || 1);
+    const px = x => 150 + (x - cx) * scale, py = y => 150 - (y - cy) * scale;
+    $('preview').innerHTML =
+      `<line x1="10" x2="290" y1="150" y2="150" stroke="#C6CCD6"/><line x1="150" x2="150" y1="10" y2="290" stroke="#C6CCD6"/>` +
+      `<circle cx="150" cy="150" r="${pcd / 2 * scale}" fill="none" stroke="#535D70" stroke-dasharray="8 3 2 3"/>` +
+      holes.map(h => `<circle cx="${px(h[2])}" cy="${py(h[3])}" r="${Math.max(2, hd / 2 * scale)}" fill="#fff" stroke="#12161F" stroke-width="1.5"/>` +
+        `<text x="${px(h[2])}" y="${py(h[3]) + 4}" text-anchor="middle">${h[0]}</text>`).join('') +
+      `<text x="286" y="144" text-anchor="end">+X</text><text x="156" y="22">+Y</text>`;
+    $('copy-note').textContent = '';
+  }
+  $('form').addEventListener('input', calc);
+  $('form').addEventListener('submit', e => e.preventDefault());
+  $('copy').addEventListener('click', () => {
+    const fallback = () => { $('copy-note').textContent = 'Copy is blocked here. Select the table and copy it instead.'; };
+    if (!navigator.clipboard) return fallback();
+    navigator.clipboard.writeText(text).then(() => { $('copy-note').textContent = 'Copied.'; }).catch(fallback);
+  });
+  calc();
+})();
+</script>
+</body>
+</html>

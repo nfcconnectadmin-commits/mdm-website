@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>MDM Thread and Drill Chart</title>
+<meta name="description" content="Metric coarse thread chart with tap drill, clearance hole and spanner sizes from M3 to M24.">
+<link rel="canonical" href="https://web-claude.duckdns.org/apps/thread-chart.html">
+<meta property="og:title" content="MDM Thread and Drill Chart">
+<meta property="og:description" content="Metric coarse threads: tap drill, clearance hole and spanner sizes.">
+<meta property="og:image" content="https://web-claude.duckdns.org/og-image.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%2318246E'/%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='%23fff' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='3.5' fill='%23FF9A5C'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Carlito:wght@400;700&family=Tinos:wght@400;700&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+<style>
+.chart-wrap { overflow-x: auto; border-top: 2px solid var(--ink); margin-bottom: 1rem; }
+.chart { width: 100%; min-width: 42rem; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.chart th, .chart td { text-align: right; padding: .6rem .75rem; border-bottom: 1px solid var(--rule); font-size: 1.0625rem; }
+.chart thead th { font-size: .9375rem; font-weight: 400; color: var(--muted); vertical-align: bottom; }
+.chart th:first-child, .chart td:first-child { text-align: left; }
+.chart tbody th { font-weight: 700; }
+.chart tbody tr:hover { background: var(--tint); }
+.filter { max-width: 22rem; margin-bottom: 1rem; }
+</style>
+</head>
+<body>
+<div class="top">
+  <header class="wrap topbar">
+    <a class="brand" href="../"><b>MDM</b><span>Mechanical Design<br>&amp; Manufacturing</span></a>
+    <nav class="topnav" aria-label="Main">
+      <a href="../">Home</a>
+      <a href="./">Apps</a>
+      <a href="thread-chart.html" aria-current="page">Thread Chart</a>
+      <a href="../#quote">Request a quote</a>
+    </nav>
+  </header>
+</div>
+<main class="wrap">
+  <div class="page-head">
+    <h1>Thread and Drill Chart</h1>
+    <p>ISO metric coarse threads from M3 to M24, with the tap drill for cutting the thread, the clearance hole for a bolt to pass through, and the spanner size.</p>
+  </div>
+  <div class="field filter">
+    <label for="find">Find a size</label>
+    <input id="find" type="text" inputmode="text" placeholder="For example M10 or 8.5" autocomplete="off">
+  </div>
+  <div class="chart-wrap" tabindex="0" role="region" aria-label="Metric thread chart">
+    <table class="chart">
+      <thead>
+        <tr>
+          <th scope="col">Thread</th>
+          <th scope="col">Pitch, mm</th>
+          <th scope="col">Tap drill, mm</th>
+          <th scope="col">Clearance hole, close, mm</th>
+          <th scope="col">Clearance hole, medium, mm</th>
+          <th scope="col">Spanner size, mm</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+  <p class="note" id="empty" hidden>No sizes match. Try a thread such as M8, or a drill size such as 6.8.</p>
+  <p class="note" style="margin-bottom:3rem">Tap drills give about 75 to 80 percent thread engagement. Clearance holes follow ISO 273, and spanner sizes follow ISO 4032 hex nuts. Check your tool maker's data for hard materials or roll-form taps, which need a different drill.</p>
+</main>
+<footer class="foot"><div class="wrap">Runs in your browser. Nothing you enter here is uploaded or saved.</div></footer>
+<script>
+(function () {
+  /* thread, pitch, tap drill, ISO 273 fine (close), ISO 273 medium, across flats */
+  const ROWS = [
+    ['M3', 0.5, 2.5, 3.2, 3.4, 5.5], ['M4', 0.7, 3.3, 4.3, 4.5, 7], ['M5', 0.8, 4.2, 5.3, 5.5, 8],
+    ['M6', 1, 5, 6.4, 6.6, 10], ['M8', 1.25, 6.8, 8.4, 9, 13], ['M10', 1.5, 8.5, 10.5, 11, 16],
+    ['M12', 1.75, 10.2, 13, 13.5, 18], ['M14', 2, 12, 15, 15.5, 21], ['M16', 2, 14, 17, 17.5, 24],
+    ['M20', 2.5, 17.5, 21, 22, 30], ['M24', 3, 21, 25, 26, 36],
+  ];
+  const body = document.getElementById('rows');
+  body.innerHTML = ROWS.map(r => `<tr data-key="${r.join(' ').toLowerCase()}"><th scope="row">${r[0]}</th>${r.slice(1).map(v => `<td>${v}</td>`).join('')}</tr>`).join('');
+  const find = document.getElementById('find');
+  find.addEventListener('input', () => {
+    const q = find.value.trim().toLowerCase();
+    let shown = 0;
+    body.querySelectorAll('tr').forEach(tr => {
+      const hit = !q || tr.dataset.key.split(' ').some(v => v === q || v.startsWith(q));
+      tr.hidden = !hit;
+      if (hit) shown++;
+    });
+    document.getElementById('empty').hidden = shown > 0;
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>MDM 3D Parts Library</title>
+<meta name="description" content="A library of adjustable 3D mechanical parts: pump impeller, pipe flange, bearing housing, coupling, gear, pulley, elbow and more.">
+<link rel="canonical" href="https://web-claude.duckdns.org/apps/parts-library.html">
+<meta property="og:title" content="MDM 3D Parts Library">
+<meta property="og:description" content="Adjustable 3D mechanical parts you can view, size, section and export as STL.">
+<meta property="og:image" content="https://web-claude.duckdns.org/og-image.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%2318246E'/%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='%23fff' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='3.5' fill='%23FF9A5C'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Carlito:wght@400;700&family=Tinos:wght@400;700&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+<style>
+.library { display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr)); padding-bottom: 3rem; }
+.card { border: 1px solid var(--rule); display: grid; grid-template-rows: auto 1fr; color: var(--ink); text-decoration: none; }
+.card:hover { border-color: var(--accent); }
+.card:hover h2 { color: var(--accent); }
+.thumb { aspect-ratio: 4 / 3; background: var(--tint); display: grid; place-items: center; border-bottom: 1px solid var(--rule); }
+.thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.thumb span { font-size: .9375rem; color: var(--muted); }
+.card-body { padding: .85rem 1rem 1rem; display: grid; gap: .35rem; align-content: start; }
+.card h2 { font: 700 1.25rem/1.2 var(--display); }
+.card p { font-size: 1rem; line-height: 1.45; color: var(--muted); }
+.card .sizes { font-size: .9375rem; color: var(--ink); font-variant-numeric: tabular-nums; }
+.card .open { font-weight: 600; color: var(--accent); font-size: 1rem; }
+</style>
+</head>
+<body>
+<div class="top">
+  <header class="wrap topbar">
+    <a class="brand" href="../"><b>MDM</b><span>Mechanical Design<br>&amp; Manufacturing</span></a>
+    <nav class="topnav" aria-label="Main">
+      <a href="../">Home</a>
+      <a href="./">Apps</a>
+      <a href="parts-library.html" aria-current="page">3D Parts Library</a>
+      <a href="part-viewer.html">3D Part Viewer</a>
+      <a href="machining-simulator.html">Machining Simulation</a>
+      <a href="../#quote">Request a quote</a>
+    </nav>
+  </header>
+</div>
+<main class="wrap">
+  <div class="page-head">
+    <h1>3D Parts Library</h1>
+    <p>Adjustable mechanical parts, shown at their default sizes. Open any part to change its dimensions, cut a section, read its mass and download an STL.</p>
+  </div>
+  <div class="library" id="library"></div>
+</main>
+<footer class="foot"><div class="wrap">Models are concept-level. Check them against your drawings and standards before manufacture.</div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin="anonymous"></script>
+<script src="../assets/viewer3d.js"></script>
+<script>
+(function () {
+  const host = document.getElementById('library');
+  const parts = window.MDM3D ? MDM3D.PARTS : {};
+  const fmt = p => p.fmt ? p.fmt(p.val) : `${p.val}${p.unit !== undefined ? p.unit : (p.key === 'holes' || p.key === 'z' || p.key === 'm' ? '' : ' mm')}`;
+  const names = {
+    flange: 'Flange', shaft: 'Stepped shaft', gear: 'Spur gear', bracket: 'L-bracket', impeller: 'Pump impeller',
+    pipeflange: 'Slip-on pipe flange', pillow: 'Bearing housing', coupling: 'Sleeve coupling', nut: 'Hex nut',
+    pulley: 'V-belt pulley', elbow: '90° pipe elbow',
+  };
+  if (!window.THREE || !window.MDM3D) {
+    host.innerHTML = '<p class="alert">The 3D library could not load. Check your connection and reload the page.</p>';
+    return;
+  }
+
+  /* One small renderer draws every thumbnail, then each picture is kept as an image. */
+  let renderer = null;
+  try {
+    renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(400, 300, false);
+    renderer.setClearColor(0xf3f5f8);
+  } catch (err) { renderer = null; }
+  const camera = new THREE.PerspectiveCamera(30, 4 / 3, 1, 20000);
+  camera.up.set(0, 0, 1);
+
+  Object.entries(parts).forEach(([key, part]) => {
+    const card = document.createElement('a');
+    card.className = 'card';
+    card.href = `part-viewer.html#${key}`;
+    const sizes = part.params.slice(0, 3).map(p => `${p.label}: ${fmt(p)}`).join(' · ');
+    card.innerHTML = `<div class="thumb"><span>Preview not available</span></div>
+      <div class="card-body"><h2></h2><p></p><span class="sizes"></span><span class="open">Open in 3D viewer</span></div>`;
+    card.querySelector('h2').textContent = part.name || names[key] || key;
+    card.querySelector('p').textContent = part.blurb;
+    card.querySelector('.sizes').textContent = sizes;
+    host.append(card);
+    if (!renderer) return;
+    try {
+      const geos = part.build(Object.fromEntries(part.params.map(p => [p.key, p.val])));
+      const scene = new THREE.Scene();
+      scene.add(new THREE.HemisphereLight(0xffffff, 0x8d96a8, 0.8));
+      const key1 = new THREE.DirectionalLight(0xffffff, 0.75);
+      key1.position.set(1, -1.4, 2);
+      scene.add(key1);
+      const group = MDM3D.partGroup(geos);
+      scene.add(group);
+      const box = MDM3D.boxOf(geos), size = new THREE.Vector3(), mid = new THREE.Vector3();
+      box.getSize(size); box.getCenter(mid);
+      const span = Math.max(size.length(), 1);
+      const dist = span / (2 * Math.tan(camera.fov * Math.PI / 360)) * 1.2;
+      camera.position.set(mid.x + dist * Math.sin(1.05) * Math.cos(-0.85), mid.y + dist * Math.sin(1.05) * Math.sin(-0.85), mid.z + dist * Math.cos(1.05));
+      camera.lookAt(mid);
+      renderer.render(scene, camera);
+      const img = new Image();
+      img.alt = `${card.querySelector('h2').textContent} at its default sizes`;
+      img.src = renderer.domElement.toDataURL('image/png');
+      card.querySelector('.thumb').replaceChildren(img);
+      MDM3D.disposeGroup(group);
+    } catch (err) { /* the card keeps its text-only placeholder */ }
+  });
+})();
+</script>
+</body>
+</html>

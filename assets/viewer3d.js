@@ -62,7 +62,7 @@
       orbit.target.copy(mid);
       const span = Math.max(size.length(), 1);
       const fit = Math.tan(camera.fov * Math.PI / 360) * Math.min(camera.aspect, 1);
-      orbit.radius = span / (2 * fit) * 0.95;
+      orbit.radius = span / (2 * fit) * 1.1;
       invalidate();
     }
     function setView(name) {
@@ -296,7 +296,284 @@
         return [extrude(baseShape, p.t, 48), outward(upright)];
       },
     },
+    impeller: {
+      name: 'Pump impeller',
+      blurb: 'A semi-open centrifugal pump impeller with backward-curved blades.',
+      params: [
+        { key: 'd', label: 'Outside diameter', min: 80, max: 300, step: 1, val: 160 },
+        { key: 'hub', label: 'Hub diameter', min: 20, max: 100, step: 1, val: 45 },
+        { key: 'bore', label: 'Bore diameter', min: 8, max: 60, step: 1, val: 16 },
+        { key: 'hubLen', label: 'Hub length', min: 15, max: 100, step: 1, val: 34 },
+        { key: 'blades', label: 'Blades', min: 3, max: 12, step: 1, val: 6, unit: '' },
+        { key: 'bh', label: 'Blade height', min: 5, max: 60, step: 1, val: 18 },
+        { key: 'bt', label: 'Blade thickness', min: 2, max: 10, step: 0.5, val: 4 },
+        { key: 'sweep', label: 'Blade wrap angle', min: 0, max: 120, step: 5, val: 60, unit: '°' },
+        { key: 'tb', label: 'Back plate thickness', min: 3, max: 20, step: 0.5, val: 6 },
+      ],
+      build(p) {
+        if (p.bore >= p.hub - 6) throw new Error('Make the bore smaller than the hub.');
+        if (p.hub >= p.d * 0.6) throw new Error('The hub is too large for this impeller diameter.');
+        if (p.hubLen <= p.tb) throw new Error('The hub must be longer than the back plate is thick.');
+        if (p.blades * p.bt * 1.6 >= Math.PI * p.hub) throw new Error('The blades crowd the hub. Use fewer or thinner blades.');
+        const plate = disc(p.d / 2);
+        plate.holes.push(hole(0, 0, p.bore / 2));
+        const hubShape = disc(p.hub / 2);
+        hubShape.holes.push(hole(0, 0, p.bore / 2));
+        const hub = extrude(hubShape, p.hubLen - p.tb);
+        hub.translate(0, 0, p.tb);
+        const parts = [extrude(plate, p.tb), hub];
+        const r1 = p.hub / 2 - 0.4, r2 = p.d / 2 - 0.5, wrap = p.sweep * Math.PI / 180;
+        const steps = 24;
+        for (let b = 0; b < p.blades; b++) {
+          const base = b * TAU / p.blades;
+          const centre = r => base - wrap * Math.pow((r - r1) / (r2 - r1), 1.2);
+          const s = new THREE.Shape();
+          const pts = [];
+          for (let k = 0; k <= steps; k++) {
+            const r = r1 + (r2 - r1) * k / steps, d = p.bt / (2 * r);
+            pts.push([r, centre(r) + d]);
+          }
+          for (let k = steps; k >= 0; k--) {
+            const r = r1 + (r2 - r1) * k / steps, d = p.bt / (2 * r);
+            pts.push([r, centre(r) - d]);
+          }
+          pts.forEach(([r, a], i) => (i ? s.lineTo(r * Math.cos(a), r * Math.sin(a)) : s.moveTo(r * Math.cos(a), r * Math.sin(a))));
+          s.closePath();
+          const blade = extrude(s, p.bh, 12);
+          blade.translate(0, 0, p.tb);
+          parts.push(outward(blade));
+        }
+        return parts;
+      },
+    },
+    pipeflange: {
+      name: 'Slip-on pipe flange',
+      blurb: 'A slip-on pipe flange with a raised face and a hub. Check sizes against your flange standard.',
+      params: [
+        { key: 'pipe', label: 'Pipe outside diameter', min: 20, max: 220, step: 0.1, val: 60.3 },
+        { key: 'od', label: 'Flange diameter', min: 60, max: 400, step: 1, val: 165 },
+        { key: 't', label: 'Flange thickness', min: 8, max: 50, step: 1, val: 18 },
+        { key: 'rf', label: 'Raised face diameter', min: 30, max: 300, step: 1, val: 102 },
+        { key: 'hub', label: 'Hub diameter', min: 25, max: 260, step: 1, val: 76 },
+        { key: 'hubLen', label: 'Hub length', min: 0, max: 80, step: 1, val: 26 },
+        { key: 'pcd', label: 'Bolt circle diameter', min: 40, max: 360, step: 1, val: 125 },
+        { key: 'holes', label: 'Bolt holes', min: 4, max: 24, step: 4, val: 4, unit: '' },
+        { key: 'hd', label: 'Bolt hole diameter', min: 8, max: 40, step: 0.5, val: 18 },
+      ],
+      build(p) {
+        const bore = p.pipe + 1;
+        if (p.hub <= bore + 4) throw new Error('Make the hub larger than the pipe.');
+        if (p.rf <= bore + 4) throw new Error('Make the raised face larger than the pipe.');
+        if (p.rf + p.hd >= p.pcd || p.hub + p.hd >= p.pcd) throw new Error('The bolt holes run into the raised face or hub. Increase the bolt circle.');
+        if (p.pcd + p.hd >= p.od) throw new Error('The bolt holes break through the outside edge. Reduce the bolt circle or enlarge the flange.');
+        if (Math.PI * p.pcd / p.holes <= p.hd * 1.15) throw new Error('The bolt holes overlap. Use fewer or smaller holes.');
+        const plate = disc(p.od / 2);
+        plate.holes.push(hole(0, 0, bore / 2));
+        for (let i = 0; i < p.holes; i++) {
+          const a = Math.PI / p.holes + i * TAU / p.holes;
+          plate.holes.push(hole(p.pcd / 2 * Math.cos(a), p.pcd / 2 * Math.sin(a), p.hd / 2));
+        }
+        const parts = [];
+        const body = extrude(plate, p.t);
+        body.translate(0, 0, p.hubLen);
+        parts.push(body);
+        const face = disc(p.rf / 2);
+        face.holes.push(hole(0, 0, bore / 2));
+        const raised = extrude(face, 2);
+        raised.translate(0, 0, p.hubLen + p.t);
+        parts.push(raised);
+        if (p.hubLen > 0) {
+          const hubShape = disc(p.hub / 2);
+          hubShape.holes.push(hole(0, 0, bore / 2));
+          parts.push(extrude(hubShape, p.hubLen));
+        }
+        return parts;
+      },
+    },
+    pillow: {
+      name: 'Bearing housing',
+      blurb: 'A pillow-block style bearing housing with a two-bolt base.',
+      params: [
+        { key: 'bore', label: 'Bearing seat diameter', min: 20, max: 120, step: 1, val: 47 },
+        { key: 'od', label: 'Housing diameter', min: 30, max: 160, step: 1, val: 80 },
+        { key: 'w', label: 'Housing width', min: 15, max: 100, step: 1, val: 40 },
+        { key: 'ch', label: 'Centre height', min: 25, max: 120, step: 1, val: 50 },
+        { key: 'len', label: 'Base length', min: 80, max: 320, step: 1, val: 165 },
+        { key: 'hb', label: 'Base thickness', min: 6, max: 40, step: 1, val: 16 },
+        { key: 'pitch', label: 'Bolt spacing', min: 50, max: 300, step: 1, val: 125 },
+        { key: 'hd', label: 'Bolt hole diameter', min: 6, max: 30, step: 0.5, val: 14 },
+      ],
+      build(p) {
+        const R = p.od / 2, rb = p.bore / 2;
+        if (p.bore >= p.od - 10) throw new Error('Leave at least 5 mm of wall around the bearing seat.');
+        if (p.ch - rb < p.hb + 3) throw new Error('The bearing seat cuts into the base. Raise the centre height.');
+        if (p.pitch / 2 - p.hd / 2 < R + 2) throw new Error('The bolt holes run into the housing. Increase the bolt spacing.');
+        if (p.pitch / 2 + p.hd / 2 > p.len / 2 - 3) throw new Error('The bolt holes break through the base ends. Lengthen the base.');
+        if (p.hd >= p.w - 4) throw new Error('The bolt holes are wider than the base.');
+        const s = new THREE.Shape();
+        s.moveTo(-R, p.hb);
+        s.lineTo(R, p.hb);
+        s.lineTo(R, p.ch);
+        s.absarc(0, p.ch, R, 0, Math.PI, false);
+        s.closePath();
+        s.holes.push(hole(0, p.ch, rb));
+        const housing = extrude(s, p.w);
+        housing.rotateX(Math.PI / 2);
+        housing.translate(0, p.w / 2, 0);
+        const base = new THREE.Shape();
+        base.moveTo(-p.len / 2, -p.w / 2); base.lineTo(p.len / 2, -p.w / 2); base.lineTo(p.len / 2, p.w / 2); base.lineTo(-p.len / 2, p.w / 2); base.closePath();
+        base.holes.push(hole(-p.pitch / 2, 0, p.hd / 2), hole(p.pitch / 2, 0, p.hd / 2));
+        return [extrude(base, p.hb, 48), outward(housing)];
+      },
+    },
+    coupling: {
+      name: 'Sleeve coupling',
+      blurb: 'A rigid sleeve coupling with a through keyway.',
+      params: [
+        { key: 'od', label: 'Outside diameter', min: 20, max: 160, step: 1, val: 50 },
+        { key: 'bore', label: 'Bore diameter', min: 6, max: 110, step: 1, val: 25 },
+        { key: 'len', label: 'Length', min: 20, max: 250, step: 1, val: 80 },
+        { key: 'kw', label: 'Keyway width', min: 0, max: 28, step: 1, val: 8 },
+        { key: 'kd', label: 'Keyway depth in hub', min: 0, max: 10, step: 0.1, val: 3.3 },
+      ],
+      build(p) {
+        const R = p.od / 2, rb = p.bore / 2;
+        if (rb + p.kd >= R - 3) throw new Error('Leave at least 3 mm of wall outside the keyway and bore.');
+        if (p.kw >= p.bore * 0.6) throw new Error('The keyway is too wide for this bore.');
+        const s = disc(R);
+        const path = new THREE.Path();
+        if (p.kw > 0 && p.kd > 0) {
+          const a = Math.asin(p.kw / 2 / rb);
+          path.moveTo(p.kw / 2, rb * Math.cos(a));
+          path.lineTo(p.kw / 2, rb + p.kd);
+          path.lineTo(-p.kw / 2, rb + p.kd);
+          path.lineTo(-p.kw / 2, rb * Math.cos(a));
+          path.absarc(0, 0, rb, Math.PI / 2 + a, Math.PI / 2 - a + TAU, false);
+        } else {
+          path.absarc(0, 0, rb, 0, TAU, true);
+        }
+        s.holes.push(path);
+        return [outward(extrude(s, p.len, 72))];
+      },
+    },
+    nut: {
+      name: 'Hex nut',
+      blurb: 'An ISO 4032 style hex nut. The thread is not modelled, and the hole is shown at tap drill size.',
+      params: [
+        { key: 'size', label: 'Thread size', min: 0, max: 9, step: 1, val: 4, fmt: v => NUTS[v][0] },
+      ],
+      build(p) {
+        const [, d, pitch, s, m] = NUTS[p.size];
+        const hex = new THREE.Shape();
+        const r = s / Math.sqrt(3);
+        for (let i = 0; i < 6; i++) {
+          const a = i * Math.PI / 3;
+          if (i) hex.lineTo(r * Math.cos(a), r * Math.sin(a)); else hex.moveTo(r * Math.cos(a), r * Math.sin(a));
+        }
+        hex.closePath();
+        hex.holes.push(hole(0, 0, (d - pitch) / 2));
+        return [outward(extrude(hex, m, 48))];
+      },
+    },
+    pulley: {
+      name: 'V-belt pulley',
+      blurb: 'A multi-groove V-belt pulley with a 38 degree groove angle.',
+      params: [
+        { key: 'od', label: 'Outside diameter', min: 50, max: 400, step: 1, val: 120 },
+        { key: 'bore', label: 'Bore diameter', min: 8, max: 100, step: 1, val: 24 },
+        { key: 'n', label: 'Grooves', min: 1, max: 6, step: 1, val: 2, unit: '' },
+        { key: 'pitch', label: 'Groove spacing', min: 10, max: 30, step: 0.5, val: 15 },
+        { key: 'top', label: 'Groove top width', min: 6, max: 22, step: 0.5, val: 11 },
+        { key: 'depth', label: 'Groove depth', min: 5, max: 20, step: 0.5, val: 11 },
+        { key: 'edge', label: 'Rim edge width', min: 3, max: 25, step: 0.5, val: 10 },
+      ],
+      build(p) {
+        const Ro = p.od / 2, rb = p.bore / 2;
+        const bw = p.top / 2, bb = bw - p.depth * Math.tan(19 * Math.PI / 180);
+        if (bb <= 0.5) throw new Error('The grooves are too deep for their width. Make them shallower or wider.');
+        if (p.top >= p.pitch) throw new Error('The grooves overlap. Increase the groove spacing.');
+        if (Ro - p.depth <= rb + 6) throw new Error('The grooves cut too close to the bore. Reduce the bore or groove depth.');
+        const width = 2 * p.edge + p.n * p.pitch;
+        const pts = [[rb, 0], [Ro, 0]];
+        for (let i = 0; i < p.n; i++) {
+          const zc = p.edge + p.pitch * (i + 0.5);
+          pts.push([Ro, zc - bw], [Ro - p.depth, zc - bb], [Ro - p.depth, zc + bb], [Ro, zc + bw]);
+        }
+        pts.push([Ro, width], [rb, width], [rb, 0]);
+        return [lathe(pts)];
+      },
+    },
+    elbow: {
+      name: '90° pipe elbow',
+      blurb: 'A 90 degree pipe bend with straight tangent ends.',
+      params: [
+        { key: 'od', label: 'Pipe outside diameter', min: 10, max: 220, step: 0.1, val: 60.3 },
+        { key: 'wall', label: 'Wall thickness', min: 1, max: 20, step: 0.1, val: 3.9 },
+        { key: 'rb', label: 'Bend radius', min: 15, max: 400, step: 1, val: 76 },
+        { key: 'tan', label: 'Straight ends', min: 0, max: 150, step: 1, val: 20 },
+      ],
+      build(p) {
+        const ro = p.od / 2, ri = ro - p.wall;
+        if (ri <= 1) throw new Error('The wall is too thick for this pipe size.');
+        if (p.rb <= ro * 1.05) throw new Error('The bend radius is too tight for this pipe. Increase it.');
+        return [elbowGeometry(ro, ri, p.rb, p.tan)];
+      },
+    },
   };
+
+  /* ISO metric coarse: size, nominal, pitch, across flats, nut height (ISO 4032) */
+  const NUTS = [
+    ['M3', 3, 0.5, 5.5, 2.4], ['M4', 4, 0.7, 7, 3.2], ['M5', 5, 0.8, 8, 4.7], ['M6', 6, 1, 10, 5.2],
+    ['M8', 8, 1.25, 13, 6.8], ['M10', 10, 1.5, 16, 8.4], ['M12', 12, 1.75, 18, 10.8], ['M16', 16, 2, 24, 14.8],
+    ['M20', 20, 2.5, 30, 18], ['M24', 24, 3, 36, 21.5],
+  ];
+
+  /* A swept tube: straight, 90 degree bend, straight. Built as one closed mesh. */
+  function elbowGeometry(ro, ri, R, L) {
+    const frames = [];
+    const add = (P, N1) => frames.push({ P, N1 });
+    if (L > 0) add(new THREE.Vector3(0, 0, -L), new THREE.Vector3(1, 0, 0));
+    const steps = 40;
+    for (let k = 0; k <= steps; k++) {
+      const u = k / steps * Math.PI / 2;
+      add(new THREE.Vector3(R * (1 - Math.cos(u)), 0, R * Math.sin(u)), new THREE.Vector3(Math.cos(u), 0, -Math.sin(u)));
+    }
+    if (L > 0) add(new THREE.Vector3(R + L, 0, R), new THREE.Vector3(0, 0, -1));
+    const S = 48, N2 = new THREE.Vector3(0, 1, 0);
+    const pos = [];
+    frames.forEach(f => {
+      [ro, ri].forEach(r => {
+        for (let j = 0; j < S; j++) {
+          const v = j / S * TAU;
+          const e = f.N1.clone().multiplyScalar(Math.cos(v)).addScaledVector(N2, Math.sin(v));
+          pos.push(f.P.x + r * e.x, f.P.y + r * e.y, f.P.z + r * e.z);
+        }
+      });
+    });
+    const o = (f, j) => f * 2 * S + (j % S);
+    const i = (f, j) => f * 2 * S + S + (j % S);
+    const idx = [];
+    for (let f = 0; f < frames.length - 1; f++) {
+      for (let j = 0; j < S; j++) {
+        const a = o(f, j), b = o(f + 1, j), c = o(f + 1, j + 1), d = o(f, j + 1);
+        idx.push(a, c, b, a, d, c);
+        const ai = i(f, j), bi = i(f + 1, j), ci = i(f + 1, j + 1), di = i(f, j + 1);
+        idx.push(ai, bi, ci, ai, ci, di);
+      }
+    }
+    const last = frames.length - 1;
+    for (let j = 0; j < S; j++) {
+      idx.push(o(0, j), i(0, j + 1), o(0, j + 1), o(0, j), i(0, j), i(0, j + 1));
+      idx.push(o(last, j), o(last, j + 1), i(last, j + 1), o(last, j), i(last, j + 1), i(last, j));
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    geo.setIndex(idx);
+    geo.computeBoundingBox();
+    geo.translate(0, 0, -geo.boundingBox.min.z);
+    geo.computeVertexNormals();
+    return outward(geo);
+  }
 
   /* ---------- Display and export ---------- */
   const METAL = 0xb4bcc7;
