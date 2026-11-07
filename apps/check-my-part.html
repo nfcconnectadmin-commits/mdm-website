@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>MDM Check My Part</title>
+<meta name="description" content="Open your STL file in 3D, get its size, volume, surface area and mass, a rough machining guide, and send it for a quote. The file stays on your device.">
+<link rel="canonical" href="https://web-claude.duckdns.org/apps/check-my-part.html">
+<meta property="og:title" content="MDM Check My Part">
+<meta property="og:description" content="Open your STL in 3D, see size, volume and mass, and request a quote.">
+<meta property="og:image" content="https://web-claude.duckdns.org/og-image.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%2318246E'/%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='%23fff' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='3.5' fill='%23FF9A5C'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Carlito:wght@400;700&family=Tinos:wght@400;700&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+<style>
+.drop { position: relative; display: grid; gap: .35rem; justify-items: center; text-align: center; padding: 1.1rem 1rem; border: 2px dashed var(--muted); background: var(--tint); cursor: pointer; }
+.drop:hover, .drop.over { border-color: var(--accent); background: #EEF0FB; }
+.drop:focus-within { outline: 3px solid var(--callout); outline-offset: 2px; }
+.drop input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.drop b { font-size: 1.0625rem; }
+.drop span { font-size: .9375rem; color: var(--muted); }
+.file-name { font-weight: 600; overflow-wrap: anywhere; }
+.stage.over { outline: 3px dashed var(--accent); outline-offset: -6px; }
+.checks { display: grid; gap: .35rem; }
+.chip { display: flex; gap: .5rem; align-items: baseline; font-size: 1rem; line-height: 1.4; }
+.chip i { flex: none; width: .7rem; height: .7rem; border: 1.5px solid currentColor; transform: translateY(1px); }
+.chip.ok { color: var(--ok); } .chip.ok i { background: currentColor; }
+.chip.warn { color: var(--warn); } .chip.warn i { background: linear-gradient(135deg, currentColor 50%, transparent 50%); }
+.chip.bad { color: var(--bad); }
+.chip span { color: var(--ink); }
+.estimate-total { font: 700 1.5rem/1.2 var(--display); }
+.quote { display: grid; gap: 1rem 1.25rem; margin-bottom: 2.5rem; }
+@media (min-width: 760px) { .quote-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .85rem 1.25rem; } .quote-fields .full { grid-column: 1 / -1; } }
+.quote-fields { display: grid; gap: .85rem; }
+.quote-fields textarea { min-height: 6rem; white-space: normal; }
+.result { display: grid; gap: .6rem; border-top: 1px solid var(--rule); padding-top: 1rem; }
+.result pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 400 .9375rem/1.5 var(--body); background: var(--tint); padding: .8rem; border: 1px solid var(--rule); }
+</style>
+</head>
+<body>
+<div class="top">
+  <header class="wrap topbar">
+    <a class="brand" href="../"><b>MDM</b><span>Mechanical Design<br>&amp; Manufacturing</span></a>
+    <nav class="topnav" aria-label="Main">
+      <a href="../">Home</a>
+      <a href="./">Apps</a>
+      <a href="check-my-part.html" aria-current="page">Check My Part</a>
+      <a href="parts-library.html">3D Parts Library</a>
+      <a href="../#quote">Request a quote</a>
+    </nav>
+  </header>
+</div>
+
+<main class="wrap">
+  <div class="page-head">
+    <h1>Check My Part</h1>
+    <p>Open your STL file to see it in 3D and get its size, volume, surface area and mass, with a rough guide to stock and machining time. Then send it to us for a quote. Your file is read in your browser and is never uploaded.</p>
+  </div>
+
+  <div class="app">
+    <div>
+      <div class="stage" id="stage">
+        <canvas id="view" aria-label="3D view of your part. Drag to rotate, scroll or pinch to zoom."></canvas>
+        <div class="stage-tools" role="group" aria-label="View and orientation">
+          <button class="btn btn-small" type="button" data-view="iso">Iso</button>
+          <button class="btn btn-small" type="button" data-view="front">Front</button>
+          <button class="btn btn-small" type="button" data-view="top">Top</button>
+          <button class="btn btn-small" type="button" data-rot="x">Turn about X</button>
+          <button class="btn btn-small" type="button" data-rot="y">Turn about Y</button>
+          <button class="btn btn-small" type="button" data-rot="z">Turn about Z</button>
+        </div>
+        <p class="stage-hint">Drag to rotate. Scroll or pinch to zoom. Turn the part to change how it sits in the stock.</p>
+      </div>
+      <p class="now" id="status" aria-live="polite"></p>
+    </div>
+
+    <div>
+      <section class="panel" aria-label="Your file">
+        <label class="drop" id="drop">
+          <input type="file" id="file" accept=".stl,model/stl,application/sla,application/vnd.ms-pki.stl">
+          <b>Choose an STL file</b>
+          <span>or drop it here. Binary or ASCII STL, up to 100 MB.</span>
+        </label>
+        <p class="file-name" id="file-name"></p>
+        <p class="alert" id="problem" role="alert"></p>
+        <div class="twoup">
+          <div class="field">
+            <label for="units">File units</label>
+            <select id="units">
+              <option value="1">Millimetres</option>
+              <option value="10">Centimetres</option>
+              <option value="1000">Metres</option>
+              <option value="25.4">Inches</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="material">Material</label>
+            <select id="material"></select>
+          </div>
+        </div>
+        <dl class="data">
+          <div><dt>Size X × Y × Z</dt><dd id="r-size"></dd></div>
+          <div><dt>Volume</dt><dd id="r-vol"></dd></div>
+          <div><dt>Mass</dt><dd id="r-mass"></dd></div>
+          <div><dt>Surface area</dt><dd id="r-area"></dd></div>
+          <div><dt>Triangles</dt><dd id="r-tris"></dd></div>
+        </dl>
+        <div class="checks" id="checks"></div>
+      </section>
+
+      <section class="panel" aria-label="Machining guide">
+        <h2>Rough machining guide</h2>
+        <div class="twoup">
+          <div class="field"><label for="allow">Stock allowance per side, mm</label><input id="allow" type="number" min="0" step="0.5" value="3"></div>
+          <div class="field"><label for="qty-guide">Quantity</label><input id="qty-guide" type="number" min="1" step="1" value="1"></div>
+          <div class="field"><label for="mrr">Roughing rate, cm³/min</label><input id="mrr" type="number" min="0.1" step="0.5"></div>
+          <div class="field"><label for="fin">Finishing rate, cm²/min</label><input id="fin" type="number" min="0.1" step="0.5"></div>
+        </div>
+        <dl class="data">
+          <div><dt>Stock block</dt><dd id="e-stock"></dd></div>
+          <div><dt>Stock weight</dt><dd id="e-stock-mass"></dd></div>
+          <div><dt>Material removed</dt><dd id="e-removed"></dd></div>
+          <div><dt>Roughing</dt><dd id="e-rough"></dd></div>
+          <div><dt>Finishing</dt><dd id="e-finish"></dd></div>
+        </dl>
+        <p>Cutting time, all parts: <span class="estimate-total" id="e-total"></span></p>
+        <label class="check"><input type="checkbox" id="show-stock" checked> Show the stock block</label>
+        <p class="note">A planning guide for 3-axis milling from a solid block, using the rates above. It leaves out setups, tool changes, fixtures, turning, casting and inspection, so it is not a price. We quote every part individually.</p>
+      </section>
+    </div>
+  </div>
+
+  <section class="panel quote" aria-labelledby="quote-title">
+    <h2 id="quote-title">Request a quote for this part</h2>
+    <p class="note">We add the part details above to your request. Your email app opens with the message ready, and you attach the STL file there, because a web page cannot attach it for you.</p>
+    <form id="rfq" novalidate>
+      <div class="quote-fields">
+        <div class="field"><label for="q-name">Your name</label><input id="q-name" autocomplete="name" required></div>
+        <div class="field"><label for="q-email">Email</label><input id="q-email" type="email" autocomplete="email" required></div>
+        <div class="field"><label for="q-company">Company (optional)</label><input id="q-company" autocomplete="organization"></div>
+        <div class="field"><label for="q-tol">Tightest tolerance (if known)</label><input id="q-tol" placeholder="e.g. ±0.05 mm"></div>
+        <div class="field full"><label for="q-notes">Anything else we should know</label><textarea id="q-notes" placeholder="Finish, threads, deadline, or what the part does"></textarea></div>
+      </div>
+      <div class="row" style="margin-top:1rem">
+        <button class="btn btn-solid" type="submit">Prepare my request</button>
+        <p class="alert" id="q-problem" role="alert"></p>
+      </div>
+      <div class="result" id="q-result" hidden>
+        <p id="q-result-text"></p>
+        <pre id="q-summary"></pre>
+        <div><button class="btn" type="button" id="q-copy">Copy request</button></div>
+      </div>
+    </form>
+  </section>
+</main>
+
+<footer class="foot"><div class="wrap">Your STL file is read on your device and is not uploaded or saved by this page.</div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin="anonymous"></script>
+<script src="../assets/viewer3d.js"></script>
+<script>
+(function () {
+  const $ = id => document.getElementById(id);
+  const CONTACT_EMAIL = 'mahmoudsobhyelagha@gmail.com';
+  const MAX_BYTES = 100 * 1024 * 1024;
+  /* name, density g/cm³, roughing rate cm³/min, finishing rate cm²/min. Rates are editable starting points. */
+  const MATERIALS = [
+    ['Aluminium 6061-T6', 2.70, 60, 40], ['Aluminium 7075-T6', 2.81, 55, 40], ['Alloy steel 4140', 7.85, 15, 15],
+    ['Stainless 316L', 8.00, 10, 10], ['Ductile iron', 7.10, 20, 20], ['Bearing bronze', 8.90, 25, 25],
+    ['Titanium Ti-6Al-4V', 4.43, 5, 6], ['Acetal (POM)', 1.41, 60, 40], ['PEEK', 1.31, 30, 30],
+  ];
+  MATERIALS.forEach((m, i) => $('material').add(new Option(m[0], i)));
+
+  const canvas = $('view');
+  function failView(msg) { canvas.parentElement.innerHTML = `<p class="stage-fail">${msg}</p>`; }
+  if (!window.THREE || !window.MDM3D) { failView('The 3D library could not load. Check your connection and reload the page.'); return; }
+  const view = MDM3D.createView(canvas);
+  if (!view) { failView('This browser or device cannot show 3D graphics, but the figures on the right still work.'); }
+
+  const state = { name: '', raw: null, geo: null, group: null, stockBox: null, info: null, sample: false };
+  const fmt = (v, d) => v.toLocaleString('en-US', { maximumFractionDigits: d, minimumFractionDigits: d });
+  const num = id => parseFloat($(id).value);
+  const minutes = m => (m >= 60 ? `${Math.floor(m / 60)} h ${Math.round(m % 60)} min` : `${fmt(m, m < 10 ? 1 : 0)} min`);
+
+  /* ---------- Reading STL ---------- */
+  function parseSTL(buf) {
+    if (buf.byteLength >= 84) {
+      const n = new DataView(buf).getUint32(80, true);
+      if (n > 0 && 84 + n * 50 === buf.byteLength) {
+        const dv = new DataView(buf), pos = new Float32Array(n * 9);
+        for (let i = 0; i < n; i++) {
+          const at = 84 + i * 50 + 12;
+          for (let k = 0; k < 9; k++) pos[i * 9 + k] = dv.getFloat32(at + k * 4, true);
+        }
+        return pos;
+      }
+    }
+    const text = new TextDecoder().decode(new Uint8Array(buf));
+    if (/^\s*solid/i.test(text) && /facet/i.test(text)) {
+      const re = /vertex\s+([-+\d.eE]+)\s+([-+\d.eE]+)\s+([-+\d.eE]+)/g;
+      const out = [];
+      let m;
+      while ((m = re.exec(text))) out.push(+m[1], +m[2], +m[3]);
+      if (out.length && out.length % 9 === 0) return new Float32Array(out);
+    }
+    throw new Error('This file could not be read as an STL. Export it from your CAD system as a binary or ASCII STL and try again.');
+  }
+
+  /* Volume, area and bounding box, from the triangles. */
+  function measure(pos) {
+    let vol = 0, area = 0;
+    for (let i = 0; i < pos.length; i += 9) {
+      const ax = pos[i], ay = pos[i + 1], az = pos[i + 2];
+      const bx = pos[i + 3], by = pos[i + 4], bz = pos[i + 5];
+      const cx = pos[i + 6], cy = pos[i + 7], cz = pos[i + 8];
+      vol += ax * (by * cz - bz * cy) - ay * (bx * cz - bz * cx) + az * (bx * cy - by * cx);
+      const ux = bx - ax, uy = by - ay, uz = bz - az, vx = cx - ax, vy = cy - ay, vz = cz - az;
+      area += Math.hypot(uy * vz - uz * vy, uz * vx - ux * vz, ux * vy - uy * vx) / 2;
+    }
+    return { vol: vol / 6, area };
+  }
+
+  /* A closed solid has every edge shared by exactly two triangles. */
+  function checkClosed(pos) {
+    const tris = pos.length / 9;
+    if (tris > 1500000) return null;
+    let lo = Infinity, hi = -Infinity;
+    for (let i = 0; i < pos.length; i++) { if (pos[i] < lo) lo = pos[i]; if (pos[i] > hi) hi = pos[i]; }
+    const tol = Math.max((hi - lo) * 1e-6, 1e-7);
+    const ids = new Map();
+    const vid = i => {
+      const key = `${Math.round(pos[i] / tol)},${Math.round(pos[i + 1] / tol)},${Math.round(pos[i + 2] / tol)}`;
+      let v = ids.get(key);
+      if (v === undefined) { v = ids.size; ids.set(key, v); }
+      return v;
+    };
+    const tv = new Uint32Array(tris * 3);
+    for (let t = 0; t < tris; t++) for (let k = 0; k < 3; k++) tv[t * 3 + k] = vid(t * 9 + k * 3);
+    const nv = ids.size, edges = new Map();
+    let degenerate = 0;
+    for (let t = 0; t < tris; t++) {
+      const a = tv[t * 3], b = tv[t * 3 + 1], c = tv[t * 3 + 2];
+      if (a === b || b === c || a === c) { degenerate++; continue; }
+      [[a, b], [b, c], [c, a]].forEach(([p, q]) => {
+        const key = p < q ? p * nv + q : q * nv + p;
+        edges.set(key, (edges.get(key) || 0) + 1);
+      });
+    }
+    let open = 0, many = 0;
+    edges.forEach(n => { if (n === 1) open++; else if (n > 2) many++; });
+    return { open, many, degenerate };
+  }
+
+  /* ---------- Display ---------- */
+  function placeOnTable(geo) {
+    geo.computeBoundingBox();
+    const b = geo.boundingBox;
+    geo.translate(-(b.min.x + b.max.x) / 2, -(b.min.y + b.max.y) / 2, -b.min.z);
+    geo.computeBoundingBox();
+  }
+  function show() {
+    if (!view) return;
+    if (state.group) { view.scene.remove(state.group); MDM3D.disposeGroup(state.group); }
+    const group = new THREE.Group();
+    group.add(new THREE.Mesh(state.geo, new THREE.MeshStandardMaterial({ color: 0xb4bcc7, metalness: 0.2, roughness: 0.5, side: THREE.DoubleSide })));
+    if (state.geo.attributes.position.count / 3 < 150000) {
+      group.add(new THREE.LineSegments(new THREE.EdgesGeometry(state.geo, 30), new THREE.LineBasicMaterial({ color: 0x12161f })));
+    }
+    state.stockBox = new THREE.Box3Helper(new THREE.Box3(), 0xb5420a);
+    group.add(state.stockBox);
+    state.group = group;
+    view.scene.add(group);
+  }
+  function rebuild(refit) {
+    const scale = parseFloat($('units').value);
+    const pos = new Float32Array(state.raw.length);
+    for (let i = 0; i < pos.length; i++) pos[i] = state.raw[i] * scale;
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geo.computeVertexNormals();
+    placeOnTable(geo);
+    if (state.geo) state.geo.dispose();
+    state.geo = geo;
+    const m = measure(pos);
+    state.info = { vol: Math.abs(m.vol), area: m.area, inverted: m.vol < 0, tris: pos.length / 9 };
+    show();
+    update();
+    if (view && refit) view.frame(stockBounds());
+  }
+  function stockBounds() {
+    const a = Math.max(0, num('allow') || 0), b = state.geo.boundingBox;
+    return new THREE.Box3(new THREE.Vector3(b.min.x - a, b.min.y - a, b.min.z - a), new THREE.Vector3(b.max.x + a, b.max.y + a, b.max.z + a));
+  }
+
+  /* ---------- Figures ---------- */
+  function update() {
+    if (!state.geo) return;
+    const mat = MATERIALS[+$('material').value];
+    const size = state.geo.boundingBox.getSize(new THREE.Vector3());
+    const cm3 = state.info.vol / 1000, area = state.info.area / 100;
+    const grams = cm3 * mat[1];
+    const mass = g => (g >= 1000 ? `${fmt(g / 1000, 2)} kg` : `${fmt(g, g < 10 ? 1 : 0)} g`);
+    $('r-size').textContent = `${fmt(size.x, 1)} × ${fmt(size.y, 1)} × ${fmt(size.z, 1)} mm`;
+    $('r-vol').textContent = `${fmt(cm3, cm3 < 10 ? 2 : 1)} cm³`;
+    $('r-mass').textContent = mass(grams);
+    $('r-area').textContent = `${fmt(area, 1)} cm²`;
+    $('r-tris').textContent = fmt(state.info.tris, 0);
+
+    const stock = stockBounds(), s = stock.getSize(new THREE.Vector3());
+    const stockCm3 = s.x * s.y * s.z / 1000, removed = Math.max(0, stockCm3 - cm3);
+    const qty = Math.max(1, Math.round(num('qty-guide') || 1));
+    const rough = removed / (num('mrr') || 1), finish = area / (num('fin') || 1);
+    $('e-stock').textContent = `${fmt(s.x, 1)} × ${fmt(s.y, 1)} × ${fmt(s.z, 1)} mm`;
+    $('e-stock-mass').textContent = mass(stockCm3 * mat[1]);
+    $('e-removed').textContent = `${fmt(removed, 1)} cm³ (${fmt(stockCm3 ? removed / stockCm3 * 100 : 0, 0)}% of the block)`;
+    $('e-rough').textContent = `${minutes(rough)} per part`;
+    $('e-finish').textContent = `${minutes(finish)} per part`;
+    $('e-total').textContent = minutes((rough + finish) * qty);
+    if (state.stockBox) {
+      state.stockBox.box.copy(stock);
+      state.stockBox.visible = $('show-stock').checked;
+    }
+
+    const checks = [];
+    if (state.closed === null) checks.push(['warn', 'Not checked for gaps, because the file has more than 1.5 million triangles.']);
+    else if (state.closed.open || state.closed.many) {
+      checks.push(['bad', `The surface has ${fmt(state.closed.open + state.closed.many, 0)} gaps or overlapping edges, so the volume and mass may be wrong. Re-export the solid or repair the file.`]);
+    } else checks.push(['ok', 'Closed solid. Volume and mass can be trusted.']);
+    if (state.info.inverted) checks.push(['warn', 'The surface normals point inwards. The figures are still correct, but some software may show the part inside out.']);
+    if (Math.max(size.x, size.y, size.z) < 3) checks.push(['warn', 'This part is very small. If it was drawn in centimetres, metres or inches, change the file units.']);
+    if (Math.max(size.x, size.y, size.z) > 3000) checks.push(['warn', 'This part is very large. If it was drawn in a smaller unit, change the file units.']);
+    if (Math.max(size.x, size.y, size.z) > 1000 && Math.max(size.x, size.y, size.z) <= 3000) checks.push(['warn', 'Over 1 m long. Large parts need a check of machine travel before quoting.']);
+    $('checks').innerHTML = checks.map(([k, t]) => `<p class="chip ${k}"><i></i><span></span></p>`).join('');
+    [...$('checks').children].forEach((el, i) => { el.querySelector('span').textContent = checks[i][1]; });
+    if (view) view.invalidate();
+  }
+
+  /* ---------- Loading ---------- */
+  function load(buf, name, sample) {
+    $('problem').textContent = '';
+    let raw;
+    try { raw = parseSTL(buf); } catch (err) { $('problem').textContent = err.message; return false; }
+    for (let i = 0; i < raw.length; i++) {
+      if (!Number.isFinite(raw[i])) { $('problem').textContent = 'This STL contains invalid coordinates. Re-export it from your CAD system.'; return false; }
+    }
+    state.raw = raw;
+    state.name = name;
+    state.sample = !!sample;
+    state.closed = checkClosed(raw);
+    $('file-name').textContent = sample ? `Sample: ${name}. Choose your own file to replace it.` : name;
+    rebuild(true);
+    $('status').textContent = sample ? 'Showing a sample part from our parts library.' : `Loaded ${name}.`;
+    return true;
+  }
+  function readFile(file) {
+    if (!file) return;
+    if (!/\.stl$/i.test(file.name)) { $('problem').textContent = 'Choose a file ending in .stl. Most CAD systems can export one with Save As or Export.'; return; }
+    if (file.size > MAX_BYTES) { $('problem').textContent = 'This file is over 100 MB. Export it with a coarser mesh and try again.'; return; }
+    $('status').textContent = `Reading ${file.name}…`;
+    const reader = new FileReader();
+    reader.onload = () => setTimeout(() => {
+      if (load(reader.result, file.name, false)) $('units').value = '1';
+    }, 20);
+    reader.onerror = () => { $('problem').textContent = 'The file could not be read. Try saving it again.'; $('status').textContent = ''; };
+    reader.readAsArrayBuffer(file);
+  }
+
+  $('file').addEventListener('change', () => readFile($('file').files[0]));
+  ['drop', 'stage'].forEach(id => {
+    const el = $(id);
+    el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('over'); });
+    el.addEventListener('dragleave', () => el.classList.remove('over'));
+    el.addEventListener('drop', e => { e.preventDefault(); el.classList.remove('over'); readFile(e.dataTransfer.files[0]); });
+  });
+  window.addEventListener('dragover', e => e.preventDefault());
+  window.addEventListener('drop', e => e.preventDefault());
+
+  $('units').addEventListener('change', () => state.raw && rebuild(true));
+  $('material').addEventListener('change', () => {
+    const m = MATERIALS[+$('material').value];
+    $('mrr').value = m[2];
+    $('fin').value = m[3];
+    update();
+  });
+  ['allow', 'qty-guide', 'mrr', 'fin'].forEach(id => $(id).addEventListener('input', update));
+  $('show-stock').addEventListener('change', update);
+  document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => view && view.setView(b.dataset.view)));
+  document.querySelectorAll('[data-rot]').forEach(b => b.addEventListener('click', () => {
+    if (!state.raw) return;
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(state.raw, 3));
+    ({ x: () => g.rotateX(Math.PI / 2), y: () => g.rotateY(Math.PI / 2), z: () => g.rotateZ(Math.PI / 2) })[b.dataset.rot]();
+    state.raw = g.attributes.position.array;
+    rebuild(true);
+  }));
+
+  /* ---------- Quote request ---------- */
+  function summary() {
+    const mat = MATERIALS[+$('material').value];
+    const company = $('q-company').value.trim(), tol = $('q-tol').value.trim(), notes = $('q-notes').value.trim();
+    const lines = [
+      `Name: ${$('q-name').value.trim()}`,
+      `Email: ${$('q-email').value.trim()}`,
+      company ? `Company: ${company}` : null,
+      '',
+      `Part file: ${state.name}${state.sample ? ' (sample)' : ''}. Please see the attached STL.`,
+      `Size: ${$('r-size').textContent}`,
+      `Volume: ${$('r-vol').textContent}`,
+      `Material: ${mat[0]}, about ${$('r-mass').textContent} each`,
+      `Surface area: ${$('r-area').textContent}`,
+      `Quantity: ${Math.max(1, Math.round(num('qty-guide') || 1))}`,
+      tol ? `Tightest tolerance: ${tol}` : null,
+      `File check: ${[...$('checks').children].map(el => el.textContent.trim()).join(' ')}`,
+      notes ? '' : null,
+      notes || null,
+    ];
+    return lines.filter(l => l !== null).join('\n');
+  }
+  $('rfq').addEventListener('submit', e => {
+    e.preventDefault();
+    const name = $('q-name'), email = $('q-email');
+    if (!name.value.trim()) { $('q-problem').textContent = 'Add your name to continue.'; name.focus(); return; }
+    if (!email.checkValidity() || !email.value.trim()) { $('q-problem').textContent = 'Enter a complete email address, such as name@company.com.'; email.focus(); return; }
+    if (!state.geo) { $('q-problem').textContent = 'Choose an STL file first.'; return; }
+    $('q-problem').textContent = '';
+    const text = summary();
+    $('q-summary').textContent = text;
+    $('q-result').hidden = false;
+    $('q-result-text').textContent = `Your email app should open with this request. Attach ${state.sample ? 'your STL file' : state.name} before sending. If the email app does not open, copy the text and send it to ${CONTACT_EMAIL}.`;
+    location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`Quote request: ${state.name}`)}&body=${encodeURIComponent(text)}`;
+  });
+  $('q-copy').addEventListener('click', () => {
+    const btn = $('q-copy');
+    const selectIt = () => {
+      const r = document.createRange();
+      r.selectNodeContents($('q-summary'));
+      const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+      btn.textContent = 'Text selected, press Ctrl+C';
+    };
+    if (!navigator.clipboard) return selectIt();
+    navigator.clipboard.writeText($('q-summary').textContent).then(() => { btn.textContent = 'Copied'; }).catch(selectIt);
+  });
+
+  /* ---------- Start with a sample so the page is never empty ---------- */
+  $('material').dispatchEvent(new Event('change'));
+  const sample = MDM3D.PARTS.pillow;
+  load(MDM3D.toSTL(sample.build(Object.fromEntries(sample.params.map(p => [p.key, p.val])))), 'bearing housing', true);
+  window.mdmCheck = { load, state, parseSTL, checkClosed, measure, summary };
+})();
+</script>
+</body>
+</html>
